@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物品审批系统 - 登录</title>
+    <style>
+        :root {
+            --primary-color: #7B68EE;
+            --primary-light: #9C8AFF;
+            --primary-dark: #6A5ACD;
+            --text-color: #333333;
+            --text-secondary: #666666;
+            --text-light: #999999;
+            --bg-color: #EDF0F5;
+            --card-bg: #FFFFFF;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --border-color: #EAEAEA;
+            --input-bg: #FFFFFF;
+            --input-border: #E5E5E5;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-color);
+        }
+        
+        .login-container {
+            background-color: var(--card-bg);
+            width: 400px;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .logo {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 24px;
+        }
+        
+        .welcome-text {
+            font-size: 22px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .sub-text {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 28px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-label {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-label::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 14px;
+            background-color: var(--primary-color);
+            margin-right: 6px;
+            border-radius: 2px;
+        }
+        
+        .form-label-icon {
+            margin-right: 6px;
+            color: var(--primary-color);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--input-border);
+            border-radius: 6px;
+            font-size: 15px;
+            transition: var(--transition);
+            background-color: var(--input-bg);
+            outline: none;
+            position: relative;
+        }
+        
+        .form-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(123, 104, 238, 0.1);
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 18px;
+        }
+        
+        .input-with-icon input {
+            padding-left: 40px;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 18px;
+            background: none;
+            border: none;
+        }
+        
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+        
+        .remember-me input[type="checkbox"] {
+            margin-right: 6px;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-color);
+        }
+        
+        .forgot-password {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 20px;
+        }
+        
+        .login-button:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .other-login-text {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        
+        .other-login-options {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .login-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .login-option:hover {
+            background-color: #ececec;
+            transform: translateY(-2px);
+        }
+        
+        .login-option img {
+            width: 22px;
+            height: 22px;
+        }
+        
+        .signup-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .signup-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                width: 90%;
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">A</div>
+        <h1 class="welcome-text">物品审批系统</h1>
+        <p class="sub-text">请登录您的账号继续使用</p>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label"><span class="form-label-icon">👤</span>用户名</label>
+                <div class="input-with-icon">
+                    <span class="input-icon">👤</span>
+                    <input type="text" class="form-input" id="username" placeholder="请输入用户名">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label"><span class="form-label-icon">🔑</span>密码</label>
+                <div class="input-with-icon">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" class="form-input" id="password" placeholder="请输入密码">
+                    <button type="button" class="password-toggle" id="togglePassword">👁️</button>
+                </div>
+            </div>
+            
+            <div class="remember-forgot">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">记住我</label>
+                </div>
+                <a href="forgot-password.html" class="forgot-password">忘记密码?</a>
+            </div>
+            
+            <button type="submit" class="login-button">登录</button>
+        </form>
+        
+        <p class="signup-text">
+            还没有账号? <a href="register.html" class="signup-link">立即注册</a>
+        </p>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const togglePasswordButton = document.getElementById('togglePassword');
+            
+            // 切换密码可见性
+            togglePasswordButton.addEventListener('click', function() {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    togglePasswordButton.textContent = '🔒';
+                } else {
+                    passwordInput.type = 'password';
+                    togglePasswordButton.textContent = '👁️';
+                }
+            });
+            
+            // 表单提交处理
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // 简单验证
+                if (!usernameInput.value.trim()) {
+                    alert('请输入用户名');
+                    return;
+                }
+                
+                if (!passwordInput.value.trim()) {
+                    alert('请输入密码');
+                    return;
+                }
+                
+                // 模拟登录
+                const loginButton = document.querySelector('.login-button');
+                const originalText = loginButton.textContent;
+                
+                loginButton.textContent = '登录中...';
+                loginButton.disabled = true;
+                
+                // 获取用户信息
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value.trim();
+                
+                // 管理员特殊处理
+                if (username === 'admin') {
+                    // 为管理员账号添加到用户列表中(如果没有的话)
+                    let users = JSON.parse(localStorage.getItem('users') || '[]');
+                    let adminUser = users.find(user => user.username === 'admin');
+                    
+                    if (!adminUser) {
+                        adminUser = {
+                            id: 'admin_' + Date.now(),
+                            username: 'admin',
+                            name: '系统管理员',
+                            password: 'admin123', // 实际应用中应加密
+                            role: 'admin',
+                            registerTime: new Date().toISOString(),
+                            lastLoginTime: new Date().toISOString()
+                        };
+                        users.push(adminUser);
+                        localStorage.setItem('users', JSON.stringify(users));
+                    } else {
+                        // 更新管理员的最后登录时间
+                        adminUser.lastLoginTime = new Date().toISOString();
+                        localStorage.setItem('users', JSON.stringify(users));
+                    }
+                    
+                    // 存储管理员信息到sessionStorage
+                    sessionStorage.setItem('currentUser', JSON.stringify({
+                        id: adminUser.id || 'admin_1',
+                        username: 'admin',
+                        name: '系统管理员',
+                        role: 'admin'
+                    }));
+                    
+                    setTimeout(function() {
+                        window.location.href = 'admin-dashboard.html';
+                    }, 1500);
+                    return;
+                }
+                
+                // 普通用户登录验证
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                const user = users.find(user => user.username === username);
+                
+                if (!user) {
+                    loginButton.textContent = originalText;
+                    loginButton.disabled = false;
+                    alert('用户不存在，请先注册');
+                    return;
+                }
+                
+                if (user.password !== password) {
+                    loginButton.textContent = originalText;
+                    loginButton.disabled = false;
+                    alert('密码错误，请重试');
+                    return;
+                }
+                
+                // 登录成功，更新最后登录时间
+                user.lastLoginTime = new Date().toISOString();
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                // 存储当前用户信息到sessionStorage
+                sessionStorage.setItem('currentUser', JSON.stringify({
+                    id: user.id,
+                    username: user.username,
+                    name: user.name,
+                    role: user.role
+                }));
+                
+                setTimeout(function() {
+                    window.location.href = 'user-dashboard.html';
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html> 

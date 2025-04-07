@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物品审批系统流程图</title>
+    <style>
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 30px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #7B68EE;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        .flow-image {
+            display: block;
+            max-width: 100%;
+            margin: 0 auto;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
+        
+        .description {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #7B68EE;
+        }
+        
+        .description h2 {
+            color: #7B68EE;
+            margin-top: 0;
+        }
+        
+        .description p {
+            line-height: 1.6;
+        }
+        
+        .description ul {
+            padding-left: 20px;
+        }
+        
+        .description li {
+            margin-bottom: 10px;
+        }
+        
+        .flow-text {
+            font-family: monospace;
+            white-space: pre;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.5;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>物品审批系统流程图</h1>
+        
+        <div style="text-align: center; margin-bottom: 30px;">
+            <img src="https://via.placeholder.com/800x500.png?text=物品审批系统流程图" alt="物品审批系统流程图" class="flow-image">
+            <p style="margin-top: 10px; color: #666;">（您可以使用浏览器的截图功能保存此文本流程图）</p>
+        </div>
+        
+        <div class="flow-text">
+开始
+  |
+  v
+[登录页面]
+  |
+  v
+{判断用户角色} ---> 若为"admin" ---> [管理员仪表盘]
+  |                                  |
+  v 若为其他用户名                    v
+[用户仪表盘] <-------------------- [查看系统统计]
+  |    |                              |
+  |    |                              v
+  |    v                          [查看待审批申请]
+  |  [查看申请统计]                    |
+  |    |                              v
+  |    v                          [查看申请详情]
+  |  [查看我的申请]                    |
+  |    |                              v
+  v    v                          {审批决定}
+[创建新申请] <----                     |
+  |           |                     /   \
+  v           |                    /     \
+[填写申请表单]  |                   v       v
+  |           |              [批准申请]  [拒绝申请]
+  v           |                   |       |
+[提交申请] ----                    |       |
+  |                                \     /
+  v                                 \   /
+[申请已提交] -------------------------> v
+  |                              [更新申请状态]
+  v                                  |
+[等待审批结果] <--------------------- v
+                                 [通知用户]
+  
+颜色图例:
+- 紫色：起始/结束节点
+- 绿色：普通用户操作
+- 淡紫色：管理员操作
+- 黄色：决策点
+- 蓝色：系统操作
+- 红色：结束节点</div>
+        
+        <div class="description">
+            <h2>流程说明</h2>
+            <p>该流程图展示了物品审批系统的完整工作流程，涵盖了从用户登录到申请处理的各个环节。</p>
+            
+            <h3>主要流程：</h3>
+            <ul>
+                <li><strong>用户登录</strong>：所有用户通过同一登录页面进入系统</li>
+                <li><strong>角色判断</strong>：系统根据用户名判断用户角色（普通用户或管理员）</li>
+                <li><strong>普通用户操作</strong>：
+                    <ul>
+                        <li>查看个人申请统计</li>
+                        <li>提交新的物品申请</li>
+                        <li>查看申请的审批状态</li>
+                    </ul>
+                </li>
+                <li><strong>管理员操作</strong>：
+                    <ul>
+                        <li>查看系统整体统计数据</li>
+                        <li>处理待审批的申请</li>
+                        <li>批准或拒绝用户的申请</li>
+                    </ul>
+                </li>
+                <li><strong>状态更新</strong>：申请状态变更后，系统更新数据并通知用户</li>
+                <li><strong>流程终止</strong>：用户通过退出登录离开系统</li>
+            </ul>
+            
+            <h3>流程图颜色说明：</h3>
+            <ul>
+                <li><span style="color: #7B68EE;">■</span> 紫色：起始/结束节点</li>
+                <li><span style="color: #4CAF50;">■</span> 绿色：普通用户操作</li>
+                <li><span style="color: #9C8AFF;">■</span> 淡紫色：管理员操作</li>
+                <li><span style="color: #FFC107;">■</span> 黄色：决策点</li>
+                <li><span style="color: #2196F3;">■</span> 蓝色：系统操作</li>
+                <li><span style="color: #F44336;">■</span> 红色：结束节点</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html> 

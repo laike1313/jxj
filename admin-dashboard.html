@@ -1,0 +1,2539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物品审批系统 - 管理员仪表盘</title>
+    <style>
+        :root {
+            --primary-color: #7B68EE;
+            --primary-light: #9C8AFF;
+            --primary-dark: #6A5ACD;
+            --text-color: #333333;
+            --text-secondary: #666666;
+            --text-light: #999999;
+            --bg-color: #EDF0F5;
+            --card-bg: #FFFFFF;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --border-color: #EAEAEA;
+            --success-color: #52C41A;
+            --warning-color: #FAAD14;
+            --error-color: #FF4D4F;
+            --sidebar-width: 220px;
+            --header-height: 64px;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+        }
+        
+        /* 侧边栏样式 */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: #2C3E50;
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 100;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .system-name {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        
+        .user-type {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .avatar-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .user-name {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .user-role {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+        }
+        
+        .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .menu-icon {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .logout-button {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            padding: 0 20px;
+        }
+        
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            font-size: 14px;
+        }
+        
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .logout-icon {
+            margin-right: 10px;
+        }
+        
+        /* 主内容区样式 */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+        
+        .header {
+            height: var(--header-height);
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .header-title {
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+        
+        .search-input {
+            padding: 8px 15px 8px 35px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+            width: 200px;
+        }
+        
+        .search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(123, 104, 238, 0.1);
+        }
+        
+        .notification-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin-right: 10px;
+            position: relative;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--error-color);
+            color: white;
+            font-size: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid white;
+        }
+        
+        /* 卡片和内容样式 */
+        .dashboard-content {
+            padding: 20px 30px;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .pending-icon {
+            background-color: rgba(250, 173, 20, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .approved-icon {
+            background-color: rgba(82, 196, 26, 0.1);
+            color: var(--success-color);
+        }
+        
+        .rejected-icon {
+            background-color: rgba(255, 77, 79, 0.1);
+            color: var(--error-color);
+        }
+        
+        .users-icon {
+            background-color: rgba(123, 104, 238, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .stat-content {
+            flex: 1;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .view-all {
+            color: var(--primary-color);
+            font-size: 14px;
+            font-weight: normal;
+            text-decoration: none;
+        }
+        
+        .table-container {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th, .table td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .table th {
+            background-color: #f9f9f9;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        .status-pill {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .status-pending {
+            background-color: rgba(250, 173, 20, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .status-approved {
+            background-color: rgba(82, 196, 26, 0.1);
+            color: var(--success-color);
+        }
+        
+        .status-rejected {
+            background-color: rgba(255, 77, 79, 0.1);
+            color: var(--error-color);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+        
+        .approve-btn {
+            background-color: rgba(82, 196, 26, 0.1);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+        
+        .approve-btn:hover {
+            background-color: rgba(82, 196, 26, 0.2);
+        }
+        
+        .reject-btn {
+            background-color: rgba(255, 77, 79, 0.1);
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+        
+        .reject-btn:hover {
+            background-color: rgba(255, 77, 79, 0.2);
+        }
+        
+        .view-btn {
+            background-color: rgba(123, 104, 238, 0.1);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+        
+        .view-btn:hover {
+            background-color: rgba(123, 104, 238, 0.2);
+        }
+        
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px 0;
+            color: var(--text-light);
+        }
+        
+        .empty-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+        
+        .empty-text {
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        /* 模态框样式 */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .modal {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            width: 500px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .item-detail {
+            margin-bottom: 15px;
+        }
+        
+        .detail-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 16px;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: var(--text-secondary);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #49ad18;
+        }
+        
+        .btn-danger {
+            background-color: var(--error-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #e64545;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            transition: var(--transition);
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 8px 16px;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        /* 分析图表样式 */
+        .chart-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .chart-title {
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .chart {
+            height: 250px;
+            display: flex;
+            align-items: flex-end;
+            gap: 15px;
+            padding-top: 20px;
+        }
+        
+        .chart-bar {
+            flex: 1;
+            background-color: var(--primary-light);
+            border-radius: 6px 6px 0 0;
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .chart-bar::after {
+            content: attr(data-value);
+            position: absolute;
+            top: -25px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .chart-label {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .chart-bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+        
+        /* 用户管理样式 */
+        .user-management {
+            display: none; /* 默认隐藏用户管理界面 */
+            padding: 20px 30px;
+        }
+        
+        .user-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            height: 100%;
+        }
+        
+        .user-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .user-card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-right: 15px;
+            color: white;
+        }
+        
+        .avatar-a {
+            background-color: var(--primary-color);
+        }
+        
+        .avatar-j {
+            background-color: #6C5CE7;
+        }
+        
+        .avatar-r {
+            background-color: #E84393;
+        }
+        
+        .avatar-t {
+            background-color: #00B894;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .user-username {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .user-role {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .user-role.admin {
+            background-color: rgba(255, 77, 79, 0.1);
+            color: var(--error-color);
+        }
+        
+        .user-role.normal {
+            background-color: rgba(123, 104, 238, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .user-creation-time {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 15px;
+        }
+        
+        .user-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: auto;
+            padding-top: 15px;
+        }
+        
+        .user-action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            transition: var(--transition);
+            opacity: 0.7;
+        }
+        
+        .user-action-btn:hover {
+            opacity: 1;
+        }
+        
+        .edit-user-btn {
+            color: #F39C12;
+        }
+        
+        .delete-user-btn {
+            color: #E74C3C;
+        }
+        
+        /* 添加用户卡片样式 */
+        .add-user-card {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            background-color: rgba(123, 104, 238, 0.05);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: var(--transition);
+            height: 100%;
+        }
+        
+        .add-user-card:hover {
+            background-color: rgba(123, 104, 238, 0.1);
+            border-color: var(--primary-color);
+        }
+        
+        .add-icon {
+            font-size: 40px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .add-text {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .form-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(123, 104, 238, 0.1);
+            outline: none;
+        }
+        
+        .filter-select {
+            background-color: white;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            padding: 8px 15px;
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+        }
+        
+        .filter-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(123, 104, 238, 0.1);
+        }
+        
+        .settings-content {
+            display: none;
+            position: absolute;
+            top: var(--header-height);
+            left: var(--sidebar-width);
+            right: 0;
+            bottom: 0;
+            z-index: 20;
+            background-color: var(--bg-color);
+            overflow-y: auto;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="system-name">物品审批系统</div>
+            <div class="user-type">管理员面板</div>
+        </div>
+        
+        <div class="avatar-container">
+            <div class="avatar">A</div>
+            <div class="user-name">admin</div>
+            <div class="user-role">系统管理员</div>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="menu-item active" data-page="dashboard">
+                <span class="menu-icon">📊</span>
+                <span>仪表盘</span>
+            </div>
+            <div class="menu-item" data-page="pending">
+                <span class="menu-icon">⌛</span>
+                <span>待审批</span>
+            </div>
+            <div class="menu-item" data-page="approved">
+                <span class="menu-icon">✅</span>
+                <span>已批准</span>
+            </div>
+            <div class="menu-item" data-page="rejected">
+                <span class="menu-icon">❌</span>
+                <span>已拒绝</span>
+            </div>
+            <div class="menu-item" data-page="users">
+                <span class="menu-icon">👥</span>
+                <span>用户管理</span>
+            </div>
+            <div class="menu-item" data-page="settings">
+                <span class="menu-icon">⚙️</span>
+                <span>系统设置</span>
+            </div>
+        </div>
+        
+        <div class="logout-button">
+            <button class="logout-btn" id="logoutBtn">
+                <span class="logout-icon">🚪</span>
+                <span>退出登录</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <div class="header">
+            <div class="header-title">管理员仪表盘</div>
+            <div class="header-actions">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" placeholder="搜索...">
+                </div>
+                <div class="notification-icon">
+                    🔔
+                    <span class="notification-badge">1</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dashboard-content">
+            <div class="stats-container" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px;">
+                <div class="stat-card" style="background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); padding: 20px; display: flex; align-items: center; transition: transform 0.3s, box-shadow 0.3s;">
+                    <div class="stat-icon pending-icon" style="width: 50px; height: 50px; border-radius: 12px; background-color: rgba(255, 171, 0, 0.1); display: flex; align-items: center; justify-content: center; font-size: 24px; margin-right: 15px; color: var(--warning-color);">⏳</div>
+                    <div class="stat-content">
+                        <div class="stat-value" style="font-size: 24px; font-weight: 700; color: var(--text-color); margin-bottom: 5px;">0</div>
+                        <div class="stat-label" style="font-size: 14px; color: var(--text-secondary);">待处理申请</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card" style="background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); padding: 20px; display: flex; align-items: center; transition: transform 0.3s, box-shadow 0.3s;">
+                    <div class="stat-icon approved-icon" style="width: 50px; height: 50px; border-radius: 12px; background-color: rgba(52, 199, 89, 0.1); display: flex; align-items: center; justify-content: center; font-size: 24px; margin-right: 15px; color: var(--success-color);">✅</div>
+                    <div class="stat-content">
+                        <div class="stat-value" style="font-size: 24px; font-weight: 700; color: var(--text-color); margin-bottom: 5px;">0</div>
+                        <div class="stat-label" style="font-size: 14px; color: var(--text-secondary);">已批准申请</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card" style="background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); padding: 20px; display: flex; align-items: center; transition: transform 0.3s, box-shadow 0.3s;">
+                    <div class="stat-icon rejected-icon" style="width: 50px; height: 50px; border-radius: 12px; background-color: rgba(255, 59, 48, 0.1); display: flex; align-items: center; justify-content: center; font-size: 24px; margin-right: 15px; color: var(--error-color);">❌</div>
+                    <div class="stat-content">
+                        <div class="stat-value" style="font-size: 24px; font-weight: 700; color: var(--text-color); margin-bottom: 5px;">0</div>
+                        <div class="stat-label" style="font-size: 14px; color: var(--text-secondary);">已拒绝申请</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card" style="background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); padding: 20px; display: flex; align-items: center; transition: transform 0.3s, box-shadow 0.3s;">
+                    <div class="stat-icon users-icon" style="width: 50px; height: 50px; border-radius: 12px; background-color: rgba(123, 104, 238, 0.1); display: flex; align-items: center; justify-content: center; font-size: 24px; margin-right: 15px; color: var(--primary-color);">👥</div>
+                    <div class="stat-content">
+                        <div class="stat-value" style="font-size: 24px; font-weight: 700; color: var(--text-color); margin-bottom: 5px;">0</div>
+                        <div class="stat-label" style="font-size: 14px; color: var(--text-secondary);">用户数量</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 30px;">
+                <div class="chart-card" style="background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); overflow: hidden; transition: transform 0.3s, box-shadow 0.3s;">
+                    <div class="chart-title" style="padding: 20px; font-size: 18px; font-weight: 500; color: var(--text-color); border-bottom: 1px solid var(--border-color);">申请类型统计 (近7天)</div>
+                    <div style="position: relative; height: 320px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
+                        <!-- 申请类型饼图 -->
+                        <div style="position: relative; width: 220px; height: 220px; border-radius: 50%; margin-bottom: 20px;" id="categoryPieChart">
+                            <!-- 饼图将通过JavaScript动态生成 -->
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                                <span style="font-size: 24px; font-weight: bold; color: var(--text-color);" id="categoryTotalCount">0</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;" id="categoryLegend">
+                            <!-- 图例将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-card" style="background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); overflow: hidden; transition: transform 0.3s, box-shadow 0.3s;">
+                    <div class="chart-title" style="padding: 20px; font-size: 18px; font-weight: 500; color: var(--text-color); border-bottom: 1px solid var(--border-color);">申请状态分布</div>
+                    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 320px; padding: 20px;">
+                        <!-- 改进的饼图实现 -->
+                        <div style="position: relative; width: 200px; height: 200px; border-radius: 50%;" id="pieChart">
+                            <!-- 饼图将通过JavaScript动态生成 -->
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 120px; height: 120px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                                <span style="font-size: 30px; font-weight: bold; color: var(--text-color);" id="totalPieCount">0</span>
+                            </div>
+                        </div>
+                        <div style="font-size: 16px; margin-top: 15px; color: var(--text-secondary); font-weight: 500;">总申请数</div>
+                        <div style="margin-top: 20px; display: flex; justify-content: center; gap: 20px;">
+                            <div style="display: flex; align-items: center;">
+                                <div style="width: 12px; height: 12px; background-color: var(--warning-color); border-radius: 50%; margin-right: 5px;"></div>
+                                <span style="font-size: 14px;" id="pendingPercentage">待处理 (0%)</span>
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <div style="width: 12px; height: 12px; background-color: var(--success-color); border-radius: 50%; margin-right: 5px;"></div>
+                                <span style="font-size: 14px;" id="approvedPercentage">已批准 (0%)</span>
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <div style="width: 12px; height: 12px; background-color: var(--error-color); border-radius: 50%; margin-right: 5px;"></div>
+                                <span style="font-size: 14px;" id="rejectedPercentage">已拒绝 (0%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);">
+                <span style="font-size: 20px; font-weight: 500; color: var(--text-color);">最近审批记录</span>
+                <a href="#" class="view-all" id="viewAllRecordsBtn" style="color: var(--primary-color); font-size: 14px; text-decoration: none; display: flex; align-items: center;">
+                    查看全部
+                    <span style="margin-left: 4px;">&#8250;</span>
+                </a>
+            </div>
+            
+            <div class="table-container" style="background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); overflow: hidden;">
+                <table class="table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background-color: #f8f9fa; border-bottom: 1px solid var(--border-color);">
+                            <th style="padding: 16px; text-align: left; font-weight: 500; color: var(--text-secondary); font-size: 14px;">ID</th>
+                            <th style="padding: 16px; text-align: left; font-weight: 500; color: var(--text-secondary); font-size: 14px;">物品名称</th>
+                            <th style="padding: 16px; text-align: left; font-weight: 500; color: var(--text-secondary); font-size: 14px;">物品类别</th>
+                            <th style="padding: 16px; text-align: left; font-weight: 500; color: var(--text-secondary); font-size: 14px;">申请人</th>
+                            <th style="padding: 16px; text-align: left; font-weight: 500; color: var(--text-secondary); font-size: 14px;">申请时间</th>
+                            <th style="padding: 16px; text-align: left; font-weight: 500; color: var(--text-secondary); font-size: 14px;">状态</th>
+                            <th style="padding: 16px; text-align: left; font-weight: 500; color: var(--text-secondary); font-size: 14px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="applicationsTable">
+                        <!-- 数据将动态填充 -->
+                    </tbody>
+                </table>
+                <div class="empty-state" id="emptyApprovalState" style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px;">
+                    <div class="empty-icon" style="font-size: 48px; margin-bottom: 16px; color: var(--text-light);">📭</div>
+                    <div class="empty-text" style="font-size: 18px; color: var(--text-secondary); margin-bottom: 8px;">暂无待处理的申请</div>
+                    <p style="color: var(--text-light); text-align: center;">当有新申请提交时，会显示在这里</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 用户管理内容 -->
+        <div class="user-management">
+            <div class="filter-options" style="display: flex; align-items: center; margin-bottom: 20px; justify-content: space-between;">
+                <div style="display: flex; align-items: center;">
+                    <select class="filter-select" id="roleFilter" style="padding: 8px 15px; border-radius: 5px; border: 1px solid var(--border-color); margin-right: 10px; min-width: 100px;">
+                        <option value="all">所有角色</option>
+                        <option value="admin">管理员</option>
+                        <option value="user">普通用户</option>
+                    </select>
+                    
+                    <select class="filter-select" id="sortOrder" style="padding: 8px 15px; border-radius: 5px; border: 1px solid var(--border-color); min-width: 120px;">
+                        <option value="name">按用户名排序</option>
+                        <option value="registerTime">按注册时间排序</option>
+                        <option value="lastLogin">按登录时间排序</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; align-items: center;">
+                    <div class="search-box" style="margin-right: 10px;">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" id="userSearchInput" placeholder="搜索用户...">
+                    </div>
+                    <button class="btn btn-primary" id="addNewUserBtn" style="display: flex; align-items: center; gap: 5px; padding: 8px 16px;">
+                        <span>+</span> 新增用户
+                    </button>
+                </div>
+            </div>
+            
+            <div id="usersList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;"></div>
+            
+            <div class="empty-state" id="emptyUsersState" style="display: none;">
+                <div class="empty-icon">👥</div>
+                <div class="empty-text">暂无用户数据</div>
+                <p>当有新用户注册时，会显示在这里</p>
+            </div>
+        </div>
+
+        <!-- 系统设置内容 - 独立于其他内容区域 -->
+        <div class="settings-content" style="display: none;">
+            <div class="settings-container" style="max-width: 800px; margin: 0 auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: var(--card-shadow);">
+                <div class="settings-header" style="margin-bottom: 30px; text-align: center;">
+                    <h2 style="font-size: 24px; margin-bottom: 10px;">系统设置</h2>
+                    <p style="color: var(--text-light);">管理您的个人信息和系统偏好</p>
+                </div>
+                
+                <div class="settings-tabs" style="display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 20px;">
+                    <div class="tab-item active" data-tab="profile" style="padding: 12px 20px; cursor: pointer; border-bottom: 2px solid var(--primary-color); color: var(--primary-color); font-weight: 500;">个人信息</div>
+                    <div class="tab-item" data-tab="appearance" style="padding: 12px 20px; cursor: pointer;">外观设置</div>
+                    <div class="tab-item" data-tab="notifications" style="padding: 12px 20px; cursor: pointer;">通知设置</div>
+                    <div class="tab-item" data-tab="security" style="padding: 12px 20px; cursor: pointer;">安全设置</div>
+                </div>
+                
+                <div class="tab-content" id="profileTab" style="display: block;">
+                    <div class="avatar-section" style="display: flex; align-items: flex-start; margin-bottom: 30px;">
+                        <div class="avatar-container" style="margin-right: 30px;">
+                            <div class="avatar-preview" style="width: 150px; height: 150px; border-radius: 50%; background-color: var(--primary-color); display: flex; justify-content: center; align-items: center; font-size: 60px; color: white; overflow: hidden; position: relative;">
+                                <img id="currentAvatar" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                                <span id="avatarPlaceholder">A</span>
+                            </div>
+                            <div style="margin-top: 15px; text-align: center;">
+                                <label for="avatarUpload" class="btn" style="display: inline-block; padding: 8px 16px; background-color: var(--primary-color); color: white; border-radius: 4px; cursor: pointer; margin-bottom: 10px;">
+                                    上传头像
+                                </label>
+                                <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+                                <button id="resetAvatar" class="btn" style="display: block; width: 100%; padding: 8px 0; background-color: #f5f5f5; border: none; border-radius: 4px; cursor: pointer;">移除头像</button>
+                            </div>
+                        </div>
+                        
+                        <div class="preset-avatars" style="flex: 1;">
+                            <h3 style="margin-bottom: 15px; font-size: 16px;">选择系统头像</h3>
+                            <div class="avatar-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+                                <div class="preset-avatar" data-color="#7B68EE" style="width: 70px; height: 70px; border-radius: 50%; background-color: #7B68EE; display: flex; justify-content: center; align-items: center; color: white; font-size: 24px; cursor: pointer;">A</div>
+                                <div class="preset-avatar" data-color="#FF6B6B" style="width: 70px; height: 70px; border-radius: 50%; background-color: #FF6B6B; display: flex; justify-content: center; align-items: center; color: white; font-size: 24px; cursor: pointer;">A</div>
+                                <div class="preset-avatar" data-color="#4CAF50" style="width: 70px; height: 70px; border-radius: 50%; background-color: #4CAF50; display: flex; justify-content: center; align-items: center; color: white; font-size: 24px; cursor: pointer;">A</div>
+                                <div class="preset-avatar" data-color="#2196F3" style="width: 70px; height: 70px; border-radius: 50%; background-color: #2196F3; display: flex; justify-content: center; align-items: center; color: white; font-size: 24px; cursor: pointer;">A</div>
+                                <div class="preset-avatar" data-color="#FF9800" style="width: 70px; height: 70px; border-radius: 50%; background-color: #FF9800; display: flex; justify-content: center; align-items: center; color: white; font-size: 24px; cursor: pointer;">A</div>
+                                <div class="preset-avatar" data-color="#9C27B0" style="width: 70px; height: 70px; border-radius: 50%; background-color: #9C27B0; display: flex; justify-content: center; align-items: center; color: white; font-size: 24px; cursor: pointer;">A</div>
+                                <div class="preset-avatar" data-color="#607D8B" style="width: 70px; height: 70px; border-radius: 50%; background-color: #607D8B; display: flex; justify-content: center; align-items: center; color: white; font-size: 24px; cursor: pointer;">A</div>
+                                <div class="preset-avatar" data-color="#E91E63" style="width: 70px; height: 70px; border-radius: 50%; background-color: #E91E63; display: flex; justify-content: center; align-items: center; color: white; font-size: 24px; cursor: pointer;">A</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-info" style="background-color: white; border-radius: 10px; padding: 20px; box-shadow: var(--card-shadow);">
+                        <h3 style="margin-bottom: 20px; font-size: 18px;">基本信息</h3>
+                        <form id="profileForm">
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">用户名</label>
+                                <input type="text" id="profileUsername" class="form-input" value="admin" readonly style="background-color: #f5f5f5; cursor: not-allowed;">
+                                <small style="color: var(--text-light); display: block; margin-top: 5px;">用户名不可修改</small>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">显示名称</label>
+                                <input type="text" id="profileDisplayName" class="form-input" value="系统管理员">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">电子邮箱</label>
+                                <input type="email" id="profileEmail" class="form-input" value="admin@example.com">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">电话号码</label>
+                                <input type="tel" id="profilePhone" class="form-input" value="">
+                            </div>
+                            
+                            <button type="submit" class="btn" style="padding: 10px 20px; background-color: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">保存修改</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="securityTab" style="display: none;">
+                    <div class="password-section" style="background-color: white; border-radius: 10px; padding: 20px; box-shadow: var(--card-shadow);">
+                        <h3 style="margin-bottom: 20px; font-size: 18px;">修改密码</h3>
+                        <form id="passwordForm">
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">当前密码</label>
+                                <input type="password" id="currentPassword" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">新密码</label>
+                                <input type="password" id="newPassword" class="form-input" required>
+                                <small style="color: var(--text-light); display: block; margin-top: 5px;">密码至少包含6个字符</small>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">确认新密码</label>
+                                <input type="password" id="confirmPassword" class="form-input" required>
+                            </div>
+                            
+                            <button type="submit" class="btn" style="padding: 10px 20px; background-color: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">更新密码</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="appearanceTab" style="display: none;">
+                    <div class="appearance-section" style="background-color: white; border-radius: 10px; padding: 20px; box-shadow: var(--card-shadow);">
+                        <h3 style="margin-bottom: 20px; font-size: 18px;">界面外观</h3>
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">主题颜色</label>
+                            <div class="color-options" style="display: flex; gap: 15px;">
+                                <div class="color-option active" data-color="#7B68EE" style="width: 30px; height: 30px; border-radius: 50%; background-color: #7B68EE; cursor: pointer; border: 2px solid #333;"></div>
+                                <div class="color-option" data-color="#FF6B6B" style="width: 30px; height: 30px; border-radius: 50%; background-color: #FF6B6B; cursor: pointer;"></div>
+                                <div class="color-option" data-color="#4CAF50" style="width: 30px; height: 30px; border-radius: 50%; background-color: #4CAF50; cursor: pointer;"></div>
+                                <div class="color-option" data-color="#2196F3" style="width: 30px; height: 30px; border-radius: 50%; background-color: #2196F3; cursor: pointer;"></div>
+                                <div class="color-option" data-color="#FF9800" style="width: 30px; height: 30px; border-radius: 50%; background-color: #FF9800; cursor: pointer;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">字体大小</label>
+                            <select id="fontSize" class="form-input">
+                                <option value="small">小</option>
+                                <option value="medium" selected>中</option>
+                                <option value="large">大</option>
+                            </select>
+                        </div>
+                        
+                        <button id="saveAppearance" class="btn" style="padding: 10px 20px; background-color: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">保存外观设置</button>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="notificationsTab" style="display: none;">
+                    <div class="notifications-section" style="background-color: white; border-radius: 10px; padding: 20px; box-shadow: var(--card-shadow);">
+                        <h3 style="margin-bottom: 20px; font-size: 18px;">通知设置</h3>
+                        
+                        <div class="form-group" style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="margin-bottom: 5px;">新申请通知</h4>
+                                <p style="color: var(--text-light); font-size: 14px;">收到新的申请时通知我</p>
+                            </div>
+                            <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                                <input type="checkbox" id="newApplicationNotice" checked>
+                                <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="margin-bottom: 5px;">用户注册通知</h4>
+                                <p style="color: var(--text-light); font-size: 14px;">有新用户注册时通知我</p>
+                            </div>
+                            <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                                <input type="checkbox" id="newUserNotice">
+                                <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="margin-bottom: 5px;">系统更新通知</h4>
+                                <p style="color: var(--text-light); font-size: 14px;">系统更新时通知我</p>
+                            </div>
+                            <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                                <input type="checkbox" id="systemUpdateNotice" checked>
+                                <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+                            </label>
+                        </div>
+                        
+                        <button id="saveNotifications" class="btn" style="padding: 10px 20px; background-color: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">保存通知设置</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 申请详情模态框 -->
+    <div class="modal-backdrop" id="applicationDetailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">申请详情</div>
+                <button class="close-button" id="closeDetailModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="item-detail">
+                    <div class="detail-label">申请ID</div>
+                    <div class="detail-value" id="detailId">#APL-001</div>
+                </div>
+                <div class="item-detail">
+                    <div class="detail-label">物品名称</div>
+                    <div class="detail-value" id="detailItemName">笔</div>
+                </div>
+                <div class="item-detail">
+                    <div class="detail-label">物品类别</div>
+                    <div class="detail-value" id="detailItemCategory">文具</div>
+                </div>
+                <div class="item-detail">
+                    <div class="detail-label">申请人</div>
+                    <div class="detail-value" id="detailApplicant">jxj</div>
+                </div>
+                <div class="item-detail">
+                    <div class="detail-label">申请数量</div>
+                    <div class="detail-value" id="detailQuantity">1</div>
+                </div>
+                <div class="item-detail">
+                    <div class="detail-label">用途说明</div>
+                    <div class="detail-value" id="detailPurpose">用于日常办公记录</div>
+                </div>
+                <div class="item-detail">
+                    <div class="detail-label">紧急程度</div>
+                    <div class="detail-value" id="detailUrgency">中</div>
+                </div>
+                <div class="item-detail">
+                    <div class="detail-label">申请时间</div>
+                    <div class="detail-value" id="detailTime">2025-04-01</div>
+                </div>
+                <div class="item-detail">
+                    <div class="detail-label">当前状态</div>
+                    <div class="detail-value" id="detailStatus">
+                        <span class="status-pill status-pending">已拒绝</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" id="modalFooterActions">
+                <!-- 根据状态动态显示操作按钮 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 用户详情/编辑模态框 -->
+    <div class="modal-backdrop" id="userModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="userModalTitle">用户详情</div>
+                <button class="close-button" id="closeUserModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="userForm">
+                    <div class="form-group">
+                        <label class="detail-label">用户名</label>
+                        <input type="text" class="form-input" id="modalUsername" placeholder="输入用户名">
+                    </div>
+                    <div class="form-group">
+                        <label class="detail-label">显示名称</label>
+                        <input type="text" class="form-input" id="modalName" placeholder="输入显示名称">
+                    </div>
+                    <div class="form-group">
+                        <label class="detail-label">密码</label>
+                        <input type="password" class="form-input" id="modalPassword" placeholder="输入密码">
+                    </div>
+                    <div class="form-group">
+                        <label class="detail-label">角色</label>
+                        <select class="form-input" id="modalRole">
+                            <option value="user">普通用户</option>
+                            <option value="admin">管理员</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="modalUserId">
+                    <input type="hidden" id="modalAction" value="add">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelUserBtn">取消</button>
+                <button class="btn btn-success" id="saveUserBtn">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 确保系统设置页面默认隐藏
+            document.querySelector('.settings-content').style.display = 'none';
+            
+            // 在页面加载时立即加载并应用管理员设置
+            loadUserSettings();
+            
+            // 设置定时刷新，每10秒检查一次新申请
+            setInterval(function() {
+                // 从localStorage重新加载申请数据
+                const freshApplications = JSON.parse(localStorage.getItem('applications') || '[]');
+                
+                // 如果有新申请，更新页面
+                if (freshApplications.length !== applications.length) {
+                    applications = freshApplications;
+                    updateStats();
+                    renderApplicationsTable();
+                    console.log('检测到新申请，页面已更新');
+                }
+                
+                // 检查是否有状态变化
+                let hasStatusChange = false;
+                
+                if (applications.length > 0 && freshApplications.length > 0) {
+                    for (let i = 0; i < freshApplications.length; i++) {
+                        // 找到对应ID的申请
+                        const oldApp = applications.find(a => a.id === freshApplications[i].id);
+                        if (oldApp && oldApp.status !== freshApplications[i].status) {
+                            hasStatusChange = true;
+                            break;
+                        }
+                    }
+                }
+                
+                // 如果有状态变化，更新页面
+                if (hasStatusChange) {
+                    applications = freshApplications;
+                    updateStats();
+                    renderApplicationsTable();
+                    console.log('检测到申请状态变化，页面已更新');
+                }
+            }, 10000); // 10秒刷新一次
+            
+            // DOM元素
+            const logoutBtn = document.getElementById('logoutBtn');
+            const menuItems = document.querySelectorAll('.menu-item');
+            const headerTitle = document.querySelector('.header-title');
+            const applicationsTable = document.getElementById('applicationsTable');
+            const emptyApprovalState = document.getElementById('emptyApprovalState');
+            const applicationDetailModal = document.getElementById('applicationDetailModal');
+            const closeDetailModalBtn = document.getElementById('closeDetailModalBtn');
+            const viewAllRecordsBtn = document.getElementById('viewAllRecordsBtn');
+            const modalFooterActions = document.getElementById('modalFooterActions');
+            
+            // 用户管理相关元素
+            const dashboardContent = document.querySelector('.dashboard-content');
+            const userManagement = document.querySelector('.user-management');
+            const usersList = document.getElementById('usersList');
+            const emptyUsersState = document.getElementById('emptyUsersState');
+            const addNewUserBtn = document.getElementById('addNewUserBtn');
+            
+            // 详情模态框元素
+            const detailId = document.getElementById('detailId');
+            const detailItemName = document.getElementById('detailItemName');
+            const detailItemCategory = document.getElementById('detailItemCategory');
+            const detailApplicant = document.getElementById('detailApplicant');
+            const detailQuantity = document.getElementById('detailQuantity');
+            const detailPurpose = document.getElementById('detailPurpose');
+            const detailUrgency = document.getElementById('detailUrgency');
+            const detailTime = document.getElementById('detailTime');
+            const detailStatus = document.getElementById('detailStatus');
+            
+            // 模拟数据
+            let applications = JSON.parse(localStorage.getItem('applications') || '[]');
+            
+            // 如果没有申请数据，提供一些示例数据
+            if (applications.length === 0) {
+                applications = [
+                    { 
+                        id: "#APL-001", 
+                        itemName: "笔", 
+                        itemCategory: "文具",
+                        applicant: "jxj", 
+                        quantity: 1, 
+                        purpose: "用于日常办公记录", 
+                        urgency: "中", 
+                        date: "2025-04-01", 
+                        status: "rejected",
+                        statusDate: "2025-04-01",
+                        statusBy: "admin"
+                    },
+                    { 
+                        id: "#APL-002", 
+                        itemName: "笔记本电脑",
+                        itemCategory: "电子设备", 
+                        applicant: "jxj", 
+                        quantity: 1, 
+                        purpose: "用于日常办公签字", 
+                        urgency: "低", 
+                        date: "2025-04-01", 
+                        status: "approved",
+                        statusDate: "2025-04-01",
+                        statusBy: "admin"
+                    }
+                ];
+                // 保存示例数据到localStorage
+                localStorage.setItem('applications', JSON.stringify(applications));
+            }
+            
+            // 渲染申请表格
+            function renderApplicationsTable(filterStatus) {
+                const filteredApps = filterStatus 
+                    ? applications.filter(app => app.status === filterStatus)
+                    : applications;
+                
+                if (filteredApps.length === 0) {
+                    applicationsTable.innerHTML = '';
+                    emptyApprovalState.style.display = 'flex';
+                } else {
+                    emptyApprovalState.style.display = 'none';
+                    
+                    let tableHtml = '';
+                    filteredApps.forEach(app => {
+                        let statusText = '';
+                        let statusClass = '';
+                        
+                        if (app.status === 'pending') {
+                            statusText = '处理中';
+                            statusClass = 'status-pending';
+                        } else if (app.status === 'approved') {
+                            statusText = '已批准';
+                            statusClass = 'status-approved';
+                        } else if (app.status === 'rejected') {
+                            statusText = '已拒绝';
+                            statusClass = 'status-rejected';
+                        }
+                        
+                        let actionsHtml = '';
+                        if (app.status === 'pending') {
+                            actionsHtml = `
+                                <button class="action-btn approve-btn" data-id="${app.id}" style="background-color: var(--success-color); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; margin-right: 6px; font-size: 12px;">批准</button>
+                                <button class="action-btn reject-btn" data-id="${app.id}" style="background-color: var(--error-color); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; margin-right: 6px; font-size: 12px;">拒绝</button>
+                                <button class="action-btn view-btn" data-id="${app.id}" style="background-color: #f0f0f0; color: var(--text-color); border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">查看</button>
+                            `;
+                        } else {
+                            actionsHtml = `<button class="action-btn view-btn" data-id="${app.id}" style="background-color: #f0f0f0; color: var(--text-color); border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">查看</button>`;
+                        }
+                        
+                        tableHtml += `
+                            <tr style="border-bottom: 1px solid var(--border-color); transition: background-color 0.3s;">
+                                <td style="padding: 16px; font-size: 14px;">${app.id}</td>
+                                <td style="padding: 16px; font-size: 14px; font-weight: 500;">${app.itemName}</td>
+                                <td style="padding: 16px; font-size: 14px;">${app.itemCategory || '未指定'}</td>
+                                <td style="padding: 16px; font-size: 14px;">${app.applicant}</td>
+                                <td style="padding: 16px; font-size: 14px;">${app.date}</td>
+                                <td style="padding: 16px; font-size: 14px;"><span class="status-pill ${statusClass}" style="padding: 4px 12px; border-radius: 20px; font-size: 12px; display: inline-block;">${statusText}</span></td>
+                                <td class="action-buttons" style="padding: 16px; font-size: 14px;">${actionsHtml}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    applicationsTable.innerHTML = tableHtml;
+                    
+                    // 添加按钮事件监听
+                    document.querySelectorAll('.view-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const id = this.getAttribute('data-id');
+                            showApplicationDetail(id);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.approve-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const id = this.getAttribute('data-id');
+                            approveApplication(id);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.reject-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const id = this.getAttribute('data-id');
+                            rejectApplication(id);
+                        });
+                    });
+                }
+            }
+            
+            // 审批申请
+            function approveApplication(id) {
+                const app = applications.find(a => a.id === id);
+                if (app) {
+                    app.status = 'approved';
+                    app.statusDate = getCurrentDate();
+                    app.statusBy = 'admin';
+                    
+                    // 获取当前管理员信息
+                    const currentAdmin = JSON.parse(sessionStorage.getItem('currentUser') || '{"username": "admin"}');
+                    app.statusBy = currentAdmin.username;
+                    
+                    // 更新localStorage中的申请数据
+                    localStorage.setItem('applications', JSON.stringify(applications));
+                    
+                    updateStats();
+                    renderApplicationsTable();
+                    alert(`已批准申请: ${id}`);
+                }
+            }
+            
+            // 拒绝申请
+            function rejectApplication(id) {
+                const app = applications.find(a => a.id === id);
+                if (app) {
+                    app.status = 'rejected';
+                    app.statusDate = getCurrentDate();
+                    
+                    // 获取当前管理员信息
+                    const currentAdmin = JSON.parse(sessionStorage.getItem('currentUser') || '{"username": "admin"}');
+                    app.statusBy = currentAdmin.username;
+                    
+                    // 更新localStorage中的申请数据
+                    localStorage.setItem('applications', JSON.stringify(applications));
+                    
+                    updateStats();
+                    renderApplicationsTable();
+                    alert(`已拒绝申请: ${id}`);
+                }
+            }
+            
+            // 显示申请详情
+            function showApplicationDetail(id) {
+                const app = applications.find(a => a.id === id);
+                if (app) {
+                    detailId.textContent = app.id;
+                    detailItemName.textContent = app.itemName;
+                    detailItemCategory.textContent = app.itemCategory || '未指定';
+                    detailApplicant.textContent = app.applicant;
+                    detailQuantity.textContent = app.quantity;
+                    detailPurpose.textContent = app.purpose;
+                    detailUrgency.textContent = app.urgency;
+                    detailTime.textContent = app.date;
+                    
+                    let statusText = '';
+                    let statusClass = '';
+                    
+                    if (app.status === 'pending') {
+                        statusText = '处理中';
+                        statusClass = 'status-pending';
+                    } else if (app.status === 'approved') {
+                        statusText = '已批准';
+                        statusClass = 'status-approved';
+                    } else if (app.status === 'rejected') {
+                        statusText = '已拒绝';
+                        statusClass = 'status-rejected';
+                    }
+                    
+                    detailStatus.innerHTML = `<span class="status-pill ${statusClass}">${statusText}</span>`;
+                    
+                    // 根据状态显示不同的操作按钮
+                    if (app.status === 'pending') {
+                        modalFooterActions.innerHTML = `
+                            <button class="btn btn-secondary" id="closeDetailBtn">关闭</button>
+                            <button class="btn btn-danger" id="rejectDetailBtn">拒绝</button>
+                            <button class="btn btn-success" id="approveDetailBtn">批准</button>
+                        `;
+                        
+                        // 添加操作按钮事件
+                        document.getElementById('approveDetailBtn').addEventListener('click', function() {
+                            approveApplication(app.id);
+                            closeDetailModal();
+                        });
+                        
+                        document.getElementById('rejectDetailBtn').addEventListener('click', function() {
+                            rejectApplication(app.id);
+                            closeDetailModal();
+                        });
+                    } else {
+                        modalFooterActions.innerHTML = `
+                            <button class="btn btn-secondary" id="closeDetailBtn">关闭</button>
+                        `;
+                    }
+                    
+                    document.getElementById('closeDetailBtn').addEventListener('click', closeDetailModal);
+                    
+                    // 显示模态框
+                    applicationDetailModal.style.display = 'flex';
+                }
+            }
+            
+            // 关闭详情模态框
+            function closeDetailModal() {
+                applicationDetailModal.style.display = 'none';
+            }
+            
+            // 更新统计数据和图表
+            function updateStats() {
+                const pendingCount = applications.filter(app => app.status === 'pending').length;
+                const approvedCount = applications.filter(app => app.status === 'approved').length;
+                const rejectedCount = applications.filter(app => app.status === 'rejected').length;
+                const totalApps = applications.length;
+                
+                // 获取最近7天的日期
+                const today = new Date();
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(today.getDate() - 7);
+                
+                // 分析申请类型 - 筛选最近7天的申请
+                const itemTypes = {};
+                const recentApps = applications.filter(app => {
+                    const appDate = new Date(app.date);
+                    return appDate >= sevenDaysAgo && appDate <= today;
+                });
+                
+                // 统计最近7天的申请类型
+                recentApps.forEach(app => {
+                    if (app.itemCategory) {
+                        if (!itemTypes[app.itemCategory]) {
+                            itemTypes[app.itemCategory] = 0;
+                        }
+                        itemTypes[app.itemCategory]++;
+                    }
+                });
+                
+                // 默认分类
+                const defaultCategories = {
+                    "文具": 0,
+                    "电子设备": 0,
+                    "办公用品": 0,
+                    "家具": 0,
+                    "其他": 0
+                };
+                
+                // 合并实际数据
+                Object.keys(itemTypes).forEach(key => {
+                    if (defaultCategories[key] !== undefined) {
+                        defaultCategories[key] += itemTypes[key];
+                    } else {
+                        defaultCategories["其他"] += itemTypes[key];
+                    }
+                });
+                
+                // 更新申请类型饼图标题，显示"最近7天申请类型分布"
+                document.querySelector('.chart-title:first-of-type').textContent = "最近7天申请类型分布";
+                
+                // 更新申请类型饼图
+                updateCategoryPieChart(defaultCategories);
+                
+                // 更新状态饼图
+                updatePieChart(pendingCount, approvedCount, rejectedCount, totalApps);
+                
+                // 从localStorage获取用户数量
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                const userCount = users.length;
+                
+                // 更新顶部卡片数据
+                document.querySelector('.pending-icon + .stat-content .stat-value').textContent = pendingCount;
+                document.querySelector('.approved-icon + .stat-content .stat-value').textContent = approvedCount;
+                document.querySelector('.rejected-icon + .stat-content .stat-value').textContent = rejectedCount;
+                document.querySelector('.users-icon + .stat-content .stat-value').textContent = userCount;
+            }
+            
+            // 更新申请类型饼图
+            function updateCategoryPieChart(categories) {
+                // 计算总数
+                const totalCount = Object.values(categories).reduce((sum, count) => sum + count, 0);
+                document.getElementById('categoryTotalCount').textContent = totalCount;
+                
+                // 如果没有数据，显示空饼图
+                if (totalCount === 0) {
+                    document.getElementById('categoryPieChart').style.background = '#f0f0f0';
+                    document.getElementById('categoryLegend').innerHTML = '<div style="color: var(--text-light);">暂无数据</div>';
+                    return;
+                }
+                
+                // 定义饼图颜色
+                const colors = {
+                    "文具": "#9C8AFF",
+                    "电子设备": "#00C9A7",
+                    "办公用品": "#FFAC33",
+                    "家具": "#FE6B8B",
+                    "其他": "#8ED1FC"
+                };
+                
+                // 构建饼图的conic-gradient CSS
+                let startPercentage = 0;
+                let gradient = '';
+                let legendHTML = '';
+                
+                // 筛选出有数据的类别
+                const filteredCategories = Object.entries(categories).filter(([_, count]) => count > 0);
+                
+                filteredCategories.forEach(([category, count], index) => {
+                    const percentage = Math.round((count / totalCount) * 100);
+                    const endPercentage = startPercentage + percentage;
+                    
+                    // 添加到渐变
+                    gradient += `${colors[category]} ${startPercentage}% ${endPercentage}%`;
+                    if (index < filteredCategories.length - 1) {
+                        gradient += ', ';
+                    }
+                    
+                    // 添加图例项
+                    legendHTML += `
+                        <div style="display: flex; align-items: center;">
+                            <div style="width: 12px; height: 12px; background-color: ${colors[category]}; border-radius: 3px; margin-right: 8px;"></div>
+                            <span style="font-size: 14px;">${category} (${percentage}%)</span>
+                        </div>
+                    `;
+                    
+                    startPercentage = endPercentage;
+                });
+                
+                // 应用饼图渐变
+                document.getElementById('categoryPieChart').style.background = `conic-gradient(${gradient})`;
+                
+                // 更新图例
+                document.getElementById('categoryLegend').innerHTML = legendHTML;
+            }
+            
+            // 更新状态饼图
+            function updatePieChart(pendingCount, approvedCount, rejectedCount, totalApps) {
+                // 计算百分比
+                const pendingPercentage = totalApps > 0 ? Math.round((pendingCount / totalApps) * 100) : 0;
+                const approvedPercentage = totalApps > 0 ? Math.round((approvedCount / totalApps) * 100) : 0;
+                const rejectedPercentage = totalApps > 0 ? Math.round((rejectedCount / totalApps) * 100) : 0;
+                
+                // 更新饼图
+                const pieChart = document.getElementById('pieChart');
+                pieChart.style.background = `conic-gradient(
+                    var(--warning-color) 0% ${pendingPercentage}%, 
+                    var(--success-color) ${pendingPercentage}% ${pendingPercentage + approvedPercentage}%, 
+                    var(--error-color) ${pendingPercentage + approvedPercentage}% 100%
+                )`;
+                
+                // 更新总数显示
+                document.getElementById('totalPieCount').textContent = totalApps;
+                
+                // 更新各状态的百分比显示
+                document.getElementById('pendingPercentage').textContent = `待处理 (${pendingPercentage}%)`;
+                document.getElementById('approvedPercentage').textContent = `已批准 (${approvedPercentage}%)`;
+                document.getElementById('rejectedPercentage').textContent = `已拒绝 (${rejectedPercentage}%)`;
+            }
+            
+            // 获取当前日期
+            function getCurrentDate() {
+                const today = new Date();
+                return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            }
+            
+            // 渲染用户列表
+            function renderUsersList(filteredUsers = null) {
+                // 从localStorage获取用户列表
+                let users = JSON.parse(localStorage.getItem('users') || '[]');
+                
+                // 应用筛选条件
+                if (filteredUsers !== null) {
+                    users = filteredUsers;
+                }
+                
+                if (users.length === 0) {
+                    usersList.innerHTML = '';
+                    emptyUsersState.style.display = 'flex';
+                } else {
+                    emptyUsersState.style.display = 'none';
+                    
+                    let usersHtml = '';
+                    
+                    // 添加新用户卡片
+                    usersHtml += `
+                        <div class="add-user-card" id="addUserCard">
+                            <div class="add-icon">+</div>
+                            <div class="add-text">添加新用户</div>
+                        </div>
+                    `;
+                    
+                    users.forEach(user => {
+                        // 获取用户名的第一个字符作为头像显示
+                        const firstChar = user.username.charAt(0).toUpperCase();
+                        const avatarClass = `avatar-${firstChar.toLowerCase()}`;
+                        
+                        // 格式化注册时间
+                        const registerDate = new Date(user.registerTime);
+                        const formattedRegisterDate = `创建时间: ${registerDate.getFullYear()}-${String(registerDate.getMonth() + 1).padStart(2, '0')}-${String(registerDate.getDate()).padStart(2, '0')}`;
+                        
+                        usersHtml += `
+                            <div class="user-card">
+                                <div class="user-card-header">
+                                    <div class="user-avatar ${avatarClass}">${firstChar}</div>
+                                    <div class="user-info">
+                                        <div class="user-name">${user.name || user.username}</div>
+                                        <div class="user-username">${user.username}</div>
+                                    </div>
+                                    <div class="user-role ${user.role === 'admin' ? 'admin' : 'normal'}">${user.role === 'admin' ? '管理员' : '普通用户'}</div>
+                                </div>
+                                <div class="user-creation-time">${formattedRegisterDate}</div>
+                                <div class="user-actions">
+                                    <button class="user-action-btn edit-user-btn" data-id="${user.id}" title="编辑">✏️</button>
+                                    <button class="user-action-btn delete-user-btn" data-id="${user.id}" title="删除">🗑️</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    usersList.innerHTML = usersHtml;
+                    
+                    // 添加用户操作按钮的事件监听
+                    document.querySelectorAll('.edit-user-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const userId = this.getAttribute('data-id');
+                            editUser(userId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.delete-user-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const userId = this.getAttribute('data-id');
+                            if (confirm(`确定要删除此用户吗？此操作不可恢复。`)) {
+                                deleteUser(userId);
+                            }
+                        });
+                    });
+                    
+                    // 添加新用户卡片点击事件
+                    document.getElementById('addUserCard').addEventListener('click', function() {
+                        showAddUserModal();
+                    });
+                }
+                
+                // 更新用户统计数
+                updateStats();
+            }
+            
+            // 显示添加用户模态框
+            function showAddUserModal() {
+                // 清空表单
+                document.getElementById('userForm').reset();
+                document.getElementById('modalUserId').value = '';
+                document.getElementById('modalAction').value = 'add';
+                document.getElementById('userModalTitle').textContent = '添加新用户';
+                
+                // 显示模态框
+                document.getElementById('userModal').style.display = 'flex';
+            }
+            
+            // 显示编辑用户模态框
+            function editUser(userId) {
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                const user = users.find(u => u.id === userId);
+                
+                if (user) {
+                    document.getElementById('modalUsername').value = user.username;
+                    document.getElementById('modalName').value = user.name || '';
+                    document.getElementById('modalPassword').value = ''; // 出于安全考虑，不显示密码
+                    document.getElementById('modalRole').value = user.role;
+                    document.getElementById('modalUserId').value = userId;
+                    document.getElementById('modalAction').value = 'edit';
+                    document.getElementById('userModalTitle').textContent = '编辑用户';
+                    
+                    // 显示模态框
+                    document.getElementById('userModal').style.display = 'flex';
+                }
+            }
+            
+            // 删除用户
+            function deleteUser(userId) {
+                let users = JSON.parse(localStorage.getItem('users') || '[]');
+                const userIndex = users.findIndex(user => user.id === userId);
+                
+                if (userIndex !== -1) {
+                    users.splice(userIndex, 1);
+                    localStorage.setItem('users', JSON.stringify(users));
+                    renderUsersList();
+                    alert('用户已成功删除');
+                }
+            }
+            
+            // 保存用户（添加或编辑）
+            function saveUser() {
+                const username = document.getElementById('modalUsername').value.trim();
+                const name = document.getElementById('modalName').value.trim();
+                const password = document.getElementById('modalPassword').value.trim();
+                const role = document.getElementById('modalRole').value;
+                const userId = document.getElementById('modalUserId').value;
+                const action = document.getElementById('modalAction').value;
+                
+                // 验证输入
+                if (!username) {
+                    alert('用户名不能为空');
+                    return;
+                }
+                
+                // 获取现有用户
+                let users = JSON.parse(localStorage.getItem('users') || '[]');
+                
+                // 检查用户名是否已存在（仅在添加新用户或修改用户名时检查）
+                if (action === 'add' || (action === 'edit' && username !== users.find(u => u.id === userId)?.username)) {
+                    const usernameExists = users.some(user => user.username === username && user.id !== userId);
+                    if (usernameExists) {
+                        alert('用户名已存在，请使用其他用户名');
+                        return;
+                    }
+                }
+                
+                // 添加或更新用户
+                if (action === 'add') {
+                    // 添加新用户
+                    if (!password) {
+                        alert('请设置密码');
+                        return;
+                    }
+                    
+                    const newUser = {
+                        id: 'user_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+                        username: username,
+                        name: name || username,
+                        password: password,
+                        role: role,
+                        registerTime: new Date().toISOString(),
+                        lastLoginTime: new Date().toISOString()
+                    };
+                    
+                    users.push(newUser);
+                } else {
+                    // 更新现有用户
+                    const userIndex = users.findIndex(user => user.id === userId);
+                    if (userIndex !== -1) {
+                        users[userIndex].username = username;
+                        users[userIndex].name = name || username;
+                        if (password) {
+                            users[userIndex].password = password;
+                        }
+                        users[userIndex].role = role;
+                    }
+                }
+                
+                // 保存到localStorage
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                // 关闭模态框并刷新用户列表
+                document.getElementById('userModal').style.display = 'none';
+                renderUsersList();
+                
+                // 显示成功消息
+                alert(action === 'add' ? '用户添加成功' : '用户更新成功');
+            }
+            
+            // 搜索和筛选用户
+            function filterUsers() {
+                const searchTerm = document.getElementById('userSearchInput').value.toLowerCase();
+                const roleFilter = document.getElementById('roleFilter').value;
+                const sortBy = document.getElementById('sortOrder').value;
+                
+                let users = JSON.parse(localStorage.getItem('users') || '[]');
+                
+                // 应用搜索过滤
+                if (searchTerm) {
+                    users = users.filter(user => 
+                        user.username.toLowerCase().includes(searchTerm) ||
+                        (user.name && user.name.toLowerCase().includes(searchTerm))
+                    );
+                }
+                
+                // 应用角色过滤
+                if (roleFilter !== 'all') {
+                    users = users.filter(user => user.role === roleFilter);
+                }
+                
+                // 应用排序
+                if (sortBy === 'name') {
+                    users.sort((a, b) => (a.name || a.username).localeCompare(b.name || b.username));
+                } else if (sortBy === 'registerTime') {
+                    users.sort((a, b) => new Date(b.registerTime) - new Date(a.registerTime));
+                } else if (sortBy === 'lastLogin') {
+                    users.sort((a, b) => new Date(b.lastLoginTime) - new Date(a.lastLoginTime));
+                }
+                
+                // 渲染过滤后的用户列表
+                renderUsersList(users);
+            }
+            
+            // 初始化
+            updateStats();
+            renderApplicationsTable();
+            
+            // 初始用户数据
+            const initialUsers = [
+                {
+                    id: "user_1",
+                    username: "admin",
+                    name: "系统管理员",
+                    password: "admin123",
+                    role: "admin",
+                    registerTime: "2025-04-07T08:00:00.000Z",
+                    lastLoginTime: "2025-04-07T10:00:00.000Z"
+                },
+                {
+                    id: "user_2",
+                    username: "jxj",
+                    name: "jxj",
+                    password: "123456",
+                    role: "user",
+                    registerTime: "2025-04-07T09:30:00.000Z",
+                    lastLoginTime: "2025-04-07T11:00:00.000Z"
+                }
+            ];
+            
+            // 如果localStorage中没有用户数据，则添加初始用户
+            if(!localStorage.getItem('users')) {
+                localStorage.setItem('users', JSON.stringify(initialUsers));
+            }
+            
+            // 菜单项点击
+            menuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const page = this.getAttribute('data-page');
+                    
+                    switch(page) {
+                        case 'dashboard':
+                            headerTitle.textContent = '管理员仪表盘';
+                            dashboardContent.style.display = 'block';
+                            userManagement.style.display = 'none';
+                            document.querySelector('.settings-content').style.display = 'none';
+                            renderApplicationsTable();
+                            break;
+                        case 'pending':
+                            headerTitle.textContent = '待处理';
+                            dashboardContent.style.display = 'block';
+                            userManagement.style.display = 'none';
+                            document.querySelector('.settings-content').style.display = 'none';
+                            renderApplicationsTable('pending');
+                            break;
+                        case 'approved':
+                            headerTitle.textContent = '已批准';
+                            dashboardContent.style.display = 'block';
+                            userManagement.style.display = 'none';
+                            document.querySelector('.settings-content').style.display = 'none';
+                            renderApplicationsTable('approved');
+                            break;
+                        case 'rejected':
+                            headerTitle.textContent = '已拒绝';
+                            dashboardContent.style.display = 'block';
+                            userManagement.style.display = 'none';
+                            document.querySelector('.settings-content').style.display = 'none';
+                            renderApplicationsTable('rejected');
+                            break;
+                        case 'users':
+                            headerTitle.textContent = '用户管理';
+                            dashboardContent.style.display = 'none';
+                            userManagement.style.display = 'block';
+                            document.querySelector('.settings-content').style.display = 'none';
+                            renderUsersList();
+                            break;
+                        case 'settings':
+                            headerTitle.textContent = '系统设置';
+                            // 隐藏所有其他内容区域
+                            dashboardContent.style.display = 'none';
+                            userManagement.style.display = 'none';
+                            
+                            // 显示系统设置内容
+                            const settingsContent = document.querySelector('.settings-content');
+                            settingsContent.style.display = 'block';
+                            settingsContent.style.zIndex = '20';
+                            
+                            // 初始化系统设置页面
+                            initSettingsPage();
+                            break;
+                    }
+                });
+            });
+            
+            // 添加新用户按钮点击
+            addNewUserBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                showAddUserModal();
+            });
+            
+            // 用户搜索和筛选
+            document.getElementById('userSearchInput').addEventListener('input', filterUsers);
+            document.getElementById('roleFilter').addEventListener('change', filterUsers);
+            document.getElementById('sortOrder').addEventListener('change', filterUsers);
+            
+            // 用户模态框
+            const userModal = document.getElementById('userModal');
+            const closeUserModalBtn = document.getElementById('closeUserModalBtn');
+            const cancelUserBtn = document.getElementById('cancelUserBtn');
+            const saveUserBtn = document.getElementById('saveUserBtn');
+            
+            // 关闭用户模态框
+            function closeUserModal() {
+                userModal.style.display = 'none';
+            }
+            
+            closeUserModalBtn.addEventListener('click', closeUserModal);
+            cancelUserBtn.addEventListener('click', closeUserModal);
+            saveUserBtn.addEventListener('click', saveUser);
+            
+            // 退出登录
+            logoutBtn.addEventListener('click', function() {
+                if (confirm('确定要退出登录吗？')) {
+                    // 确保所有设置都已保存到localStorage中
+                    const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{"username": "admin"}');
+                    
+                    // 清除sessionStorage中的当前用户信息
+                    // sessionStorage.removeItem('currentUser');
+                    
+                    // 重定向到登录页面
+                    window.location.href = 'login.html';
+                }
+            });
+            
+            // 查看全部记录
+            viewAllRecordsBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('查看全部申请记录');
+            });
+            
+            // 关闭详情模态框
+            closeDetailModalBtn.addEventListener('click', closeDetailModal);
+            
+            // 点击模态框背景关闭
+            applicationDetailModal.addEventListener('click', function(e) {
+                if (e.target === applicationDetailModal) {
+                    closeDetailModal();
+                }
+            });
+            
+            // 点击用户模态框背景关闭
+            userModal.addEventListener('click', function(e) {
+                if (e.target === userModal) {
+                    closeUserModal();
+                }
+            });
+            
+            // 初始化系统设置页面
+            function initSettingsPage() {
+                console.log('初始化管理员系统设置页面');
+                
+                // 确保设置容器样式正确
+                const settingsContainer = document.querySelector('.settings-container');
+                if (settingsContainer) {
+                    settingsContainer.style.backgroundColor = 'white';
+                    settingsContainer.style.borderRadius = '10px';
+                    settingsContainer.style.boxShadow = 'var(--card-shadow)';
+                    settingsContainer.style.padding = '20px';
+                }
+                
+                // 加载用户配置
+                loadUserSettings();
+                
+                // 设置选项卡切换
+                const tabItems = document.querySelectorAll('.tab-item');
+                const tabContents = document.querySelectorAll('.tab-content');
+                
+                tabItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        const tab = this.getAttribute('data-tab');
+                        
+                        // 切换选项卡激活状态
+                        tabItems.forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // 更新选项卡样式
+                        tabItems.forEach(t => {
+                            t.style.borderBottom = 'none';
+                            t.style.color = 'var(--text-secondary)';
+                            t.style.fontWeight = 'normal';
+                        });
+                        this.style.borderBottom = '2px solid var(--primary-color)';
+                        this.style.color = 'var(--primary-color)';
+                        this.style.fontWeight = '500';
+                        
+                        // 切换内容显示
+                        tabContents.forEach(content => {
+                            content.style.display = 'none';
+                        });
+                        document.getElementById(tab + 'Tab').style.display = 'block';
+                    });
+                });
+                
+                // 头像上传处理
+                const avatarUpload = document.getElementById('avatarUpload');
+                const currentAvatar = document.getElementById('currentAvatar');
+                const avatarPlaceholder = document.getElementById('avatarPlaceholder');
+                const resetAvatar = document.getElementById('resetAvatar');
+                
+                // 处理文件上传
+                avatarUpload.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    // 检查文件类型
+                    if (!file.type.match('image.*')) {
+                        alert('请上传图片文件');
+                        return;
+                    }
+                    
+                    // 预览上传的图片
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        currentAvatar.src = e.target.result;
+                        currentAvatar.style.display = 'block';
+                        avatarPlaceholder.style.display = 'none';
+                        
+                        // 保存头像到localStorage
+                        saveUserSettings({
+                            avatar: e.target.result,
+                            avatarType: 'custom'
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                });
+                
+                // 重置头像
+                resetAvatar.addEventListener('click', function() {
+                    currentAvatar.src = '';
+                    currentAvatar.style.display = 'none';
+                    avatarPlaceholder.style.display = 'block';
+                    
+                    // 更新设置
+                    saveUserSettings({
+                        avatar: null,
+                        avatarType: 'default',
+                        avatarColor: '#7B68EE'
+                    });
+                });
+                
+                // 预设头像选择
+                const presetAvatars = document.querySelectorAll('.preset-avatar');
+                presetAvatars.forEach(avatar => {
+                    avatar.addEventListener('click', function() {
+                        const color = this.getAttribute('data-color');
+                        
+                        // 更新预览
+                        currentAvatar.style.display = 'none';
+                        avatarPlaceholder.style.display = 'block';
+                        document.querySelector('.avatar-preview').style.backgroundColor = color;
+                        
+                        // 保存设置
+                        saveUserSettings({
+                            avatar: null,
+                            avatarType: 'preset',
+                            avatarColor: color
+                        });
+                    });
+                });
+                
+                // 个人信息表单提交
+                const profileForm = document.getElementById('profileForm');
+                profileForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // 获取表单数据
+                    const displayName = document.getElementById('profileDisplayName').value;
+                    const email = document.getElementById('profileEmail').value;
+                    const phone = document.getElementById('profilePhone').value;
+                    
+                    // 保存用户设置
+                    saveUserSettings({
+                        displayName: displayName,
+                        email: email,
+                        phone: phone
+                    });
+                    
+                    alert('个人信息已更新');
+                });
+                
+                // 密码修改表单提交
+                const passwordForm = document.getElementById('passwordForm');
+                passwordForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const currentPassword = document.getElementById('currentPassword').value;
+                    const newPassword = document.getElementById('newPassword').value;
+                    const confirmPassword = document.getElementById('confirmPassword').value;
+                    
+                    // 简单验证
+                    if (!currentPassword || !newPassword || !confirmPassword) {
+                        alert('请填写所有密码字段');
+                        return;
+                    }
+                    
+                    if (newPassword.length < 6) {
+                        alert('新密码长度不能少于6个字符');
+                        return;
+                    }
+                    
+                    if (newPassword !== confirmPassword) {
+                        alert('两次输入的新密码不一致');
+                        return;
+                    }
+                    
+                    // 验证当前密码
+                    // 实际项目中应该进行后端验证，这里简化处理
+                    if (currentPassword !== 'admin123') {
+                        alert('当前密码不正确');
+                        return;
+                    }
+                    
+                    // 更新密码
+                    // 实际项目中应该调用API更新密码，这里仅模拟成功
+                    alert('密码已成功更新');
+                    passwordForm.reset();
+                });
+                
+                // 外观设置保存
+                const saveAppearance = document.getElementById('saveAppearance');
+                saveAppearance.addEventListener('click', function() {
+                    const fontSize = document.getElementById('fontSize').value;
+                    
+                    // 获取选中的颜色
+                    let themeColor = '#7B68EE';
+                    document.querySelectorAll('.color-option').forEach(option => {
+                        if (option.classList.contains('active')) {
+                            themeColor = option.getAttribute('data-color');
+                        }
+                    });
+                    
+                    // 保存设置
+                    saveUserSettings({
+                        fontSize: fontSize,
+                        themeColor: themeColor
+                    });
+                    
+                    alert('外观设置已保存');
+                });
+                
+                // 颜色选项点击
+                const colorOptions = document.querySelectorAll('.color-option');
+                colorOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        // 移除所有active类
+                        colorOptions.forEach(o => {
+                            o.classList.remove('active');
+                            o.style.border = 'none';
+                        });
+                        
+                        // 设置当前选中
+                        this.classList.add('active');
+                        this.style.border = '2px solid #333';
+                    });
+                });
+                
+                // 通知设置保存
+                const saveNotifications = document.getElementById('saveNotifications');
+                saveNotifications.addEventListener('click', function() {
+                    const newApplicationNotice = document.getElementById('newApplicationNotice').checked;
+                    const newUserNotice = document.getElementById('newUserNotice').checked;
+                    const systemUpdateNotice = document.getElementById('systemUpdateNotice').checked;
+                    
+                    // 保存设置
+                    saveUserSettings({
+                        notifications: {
+                            newApplication: newApplicationNotice,
+                            newUser: newUserNotice,
+                            systemUpdate: systemUpdateNotice
+                        }
+                    });
+                    
+                    alert('通知设置已保存');
+                });
+            }
+            
+            // 加载用户设置
+            function loadUserSettings() {
+                // 获取当前管理员信息
+                const currentAdmin = JSON.parse(sessionStorage.getItem('currentUser') || '{"username": "admin"}');
+                
+                // 从localStorage获取设置
+                const settings = JSON.parse(localStorage.getItem(`userSettings_${currentAdmin.username}`) || '{}');
+                
+                // 应用头像设置到侧边栏
+                if (settings.avatarType === 'custom' && settings.avatar) {
+                    // 自定义上传的头像
+                    const sidebarAvatar = document.querySelector('.sidebar .avatar');
+                    sidebarAvatar.innerHTML = '';
+                    const img = document.createElement('img');
+                    img.src = settings.avatar;
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    sidebarAvatar.appendChild(img);
+                    
+                    // 设置页面预览
+                    if (document.getElementById('currentAvatar')) {
+                        document.getElementById('currentAvatar').src = settings.avatar;
+                        document.getElementById('currentAvatar').style.display = 'block';
+                        document.getElementById('avatarPlaceholder').style.display = 'none';
+                    }
+                } else if (settings.avatarType === 'preset' && settings.avatarColor) {
+                    // 预设颜色头像
+                    const sidebarAvatar = document.querySelector('.sidebar .avatar');
+                    sidebarAvatar.innerHTML = 'A';
+                    sidebarAvatar.style.backgroundColor = settings.avatarColor;
+                    
+                    // 设置页面预览
+                    if (document.querySelector('.avatar-preview')) {
+                        document.querySelector('.avatar-preview').style.backgroundColor = settings.avatarColor;
+                        if (document.getElementById('currentAvatar')) {
+                            document.getElementById('currentAvatar').style.display = 'none';
+                        }
+                        if (document.getElementById('avatarPlaceholder')) {
+                            document.getElementById('avatarPlaceholder').style.display = 'block';
+                        }
+                    }
+                }
+                
+                // 应用用户名称到侧边栏
+                if (settings.displayName) {
+                    const userNameElement = document.querySelector('.sidebar .user-name');
+                    if (userNameElement) {
+                        userNameElement.textContent = settings.displayName;
+                    }
+                }
+                
+                // 填充基本信息
+                if (settings.displayName && document.getElementById('profileDisplayName')) {
+                    document.getElementById('profileDisplayName').value = settings.displayName;
+                }
+                
+                if (settings.email && document.getElementById('profileEmail')) {
+                    document.getElementById('profileEmail').value = settings.email;
+                }
+                
+                if (settings.phone && document.getElementById('profilePhone')) {
+                    document.getElementById('profilePhone').value = settings.phone;
+                }
+                
+                // 设置颜色选项
+                if (settings.themeColor) {
+                    const colorOptions = document.querySelectorAll('.color-option');
+                    colorOptions.forEach(option => {
+                        option.classList.remove('active');
+                        option.style.border = 'none';
+                        
+                        if (option.getAttribute('data-color') === settings.themeColor) {
+                            option.classList.add('active');
+                            option.style.border = '2px solid #333';
+                        }
+                    });
+                }
+                
+                // 设置字体大小
+                if (settings.fontSize && document.getElementById('fontSize')) {
+                    document.getElementById('fontSize').value = settings.fontSize;
+                }
+                
+                // 设置通知选项
+                if (settings.notifications) {
+                    const notices = settings.notifications;
+                    if (document.getElementById('newApplicationNotice')) {
+                        document.getElementById('newApplicationNotice').checked = notices.newApplication !== false;
+                    }
+                    if (document.getElementById('newUserNotice')) {
+                        document.getElementById('newUserNotice').checked = !!notices.newUser;
+                    }
+                    if (document.getElementById('systemUpdateNotice')) {
+                        document.getElementById('systemUpdateNotice').checked = notices.systemUpdate !== false;
+                    }
+                }
+            }
+            
+            // 保存用户设置
+            function saveUserSettings(newSettings) {
+                // 获取当前管理员信息
+                const currentAdmin = JSON.parse(sessionStorage.getItem('currentUser') || '{"username": "admin"}');
+                
+                // 获取当前设置
+                const currentSettings = JSON.parse(localStorage.getItem(`userSettings_${currentAdmin.username}`) || '{}');
+                
+                // 合并新设置
+                const updatedSettings = { ...currentSettings, ...newSettings };
+                
+                // 保存到localStorage
+                localStorage.setItem(`userSettings_${currentAdmin.username}`, JSON.stringify(updatedSettings));
+                
+                // 更新侧边栏的管理员头像
+                updateAdminAvatar(updatedSettings);
+            }
+            
+            // 更新管理员头像
+            function updateAdminAvatar(settings) {
+                const sidebarAvatar = document.querySelector('.sidebar .avatar');
+                
+                if (settings.avatarType === 'custom' && settings.avatar) {
+                    // 处理自定义上传的头像
+                    sidebarAvatar.innerHTML = '';
+                    const img = document.createElement('img');
+                    img.src = settings.avatar;
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    sidebarAvatar.appendChild(img);
+                    
+                    // 更新设置页面的头像预览
+                    if (document.getElementById('currentAvatar')) {
+                        document.getElementById('currentAvatar').src = settings.avatar;
+                        document.getElementById('currentAvatar').style.display = 'block';
+                        document.getElementById('avatarPlaceholder').style.display = 'none';
+                    }
+                } else if (settings.avatarType === 'preset' && settings.avatarColor) {
+                    // 处理预设颜色头像
+                    sidebarAvatar.innerHTML = 'A';
+                    sidebarAvatar.style.backgroundColor = settings.avatarColor;
+                    
+                    // 更新设置页面的头像预览
+                    if (document.querySelector('.avatar-preview')) {
+                        document.querySelector('.avatar-preview').style.backgroundColor = settings.avatarColor;
+                        document.getElementById('currentAvatar').style.display = 'none';
+                        document.getElementById('avatarPlaceholder').style.display = 'block';
+                    }
+                }
+                
+                // 更新显示名称
+                if (settings.displayName) {
+                    document.querySelector('.sidebar .user-name').textContent = settings.displayName;
+                }
+            }
+        });
+    </script>
+</body>
+</html> 
