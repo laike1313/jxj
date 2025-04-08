@@ -1,21 +1,41 @@
-# 物品审批系统 - 后端接口文档
-
-本文档详细描述了物品审批系统所需的所有后端API接口，供后端开发人员参考。
+# 物品审批系统后端接口文档
 
 ## 基础信息
 
-- 基础URL: `https://api.example.com/v1` (实际部署时请替换)
+- 基础URL: `https://mvlcsuqfvvmt.sealoshzh.site/api/v1`
 - 认证方式: JWT (JSON Web Token)
-- 数据格式: JSON
 - 请求头: 
   ```
   Content-Type: application/json
   Authorization: Bearer {token} (除登录/注册接口外的所有接口都需要)
   ```
 
-## 错误处理
+## 统一响应格式
 
-所有API返回的错误格式统一为：
+### 成功响应
+
+```json
+{
+  "success": true,
+  "data": {
+    // 返回数据...
+  }
+}
+```
+
+或
+
+```json
+{
+  "success": true,
+  "message": "操作成功消息",
+  "data": {
+    // 可选的返回数据...
+  }
+}
+```
+
+### 错误响应
 
 ```json
 {
@@ -25,18 +45,9 @@
 }
 ```
 
-常见错误码：
-- 400: 请求参数错误
-- 401: 未认证或认证过期
-- 403: 权限不足
-- 404: 资源不存在
-- 500: 服务器内部错误
+## 1. 用户认证
 
-## 接口列表
-
-### 1. 用户认证
-
-#### 1.1 用户登录
+### 1.1 用户登录
 
 - **URL**: `/auth/login`
 - **方法**: POST
@@ -64,8 +75,16 @@
     }
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 401,
+    "message": "用户名或密码不正确"
+  }
+  ```
 
-#### 1.2 用户注册
+### 1.2 用户注册
 
 - **URL**: `/auth/register`
 - **方法**: POST
@@ -90,8 +109,16 @@
     }
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 400,
+    "message": "输入的值已存在"
+  }
+  ```
 
-#### 1.3 找回密码
+### 1.3 找回密码
 
 - **URL**: `/auth/forgot-password`
 - **方法**: POST
@@ -109,8 +136,16 @@
     "message": "密码重置链接已发送到您的邮箱"
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 404,
+    "message": "该邮箱未注册"
+  }
+  ```
 
-#### 1.4 重置密码
+### 1.4 重置密码
 
 - **URL**: `/auth/reset-password`
 - **方法**: POST
@@ -129,10 +164,18 @@
     "message": "密码已重置，请使用新密码登录"
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 400,
+    "message": "无效的重置令牌"
+  }
+  ```
 
-### 2. 用户管理
+## 2. 用户管理
 
-#### 2.1 获取用户列表
+### 2.1 获取用户列表
 
 - **URL**: `/users`
 - **方法**: GET
@@ -167,8 +210,16 @@
     }
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 403,
+    "message": "用户角色 user 无权访问此资源"
+  }
+  ```
 
-#### 2.2 获取用户详情
+### 2.2 获取用户详情
 
 - **URL**: `/users/{userId}`
 - **方法**: GET
@@ -190,8 +241,16 @@
     }
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 404,
+    "message": "找不到ID为{userId}的用户"
+  }
+  ```
 
-#### 2.3 创建用户
+### 2.3 创建用户
 
 - **URL**: `/users`
 - **方法**: POST
@@ -218,8 +277,16 @@
     }
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 400,
+    "message": "输入的值已存在"
+  }
+  ```
 
-#### 2.4 更新用户信息
+### 2.4 更新用户信息
 
 - **URL**: `/users/{userId}`
 - **方法**: PUT
@@ -249,8 +316,16 @@
     }
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 403,
+    "message": "未授权更新此用户"
+  }
+  ```
 
-#### 2.5 修改密码
+### 2.5 修改密码
 
 - **URL**: `/users/{userId}/password`
 - **方法**: PATCH
@@ -269,8 +344,16 @@
     "message": "密码修改成功"
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 401,
+    "message": "当前密码不正确"
+  }
+  ```
 
-#### 2.6 删除用户
+### 2.6 删除用户
 
 - **URL**: `/users/{userId}`
 - **方法**: DELETE
@@ -282,10 +365,18 @@
     "message": "用户已删除"
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 403,
+    "message": "用户角色 user 无权访问此资源"
+  }
+  ```
 
-### 3. 申请管理
+## 3. 申请管理
 
-#### 3.1 获取申请列表
+### 3.1 获取申请列表
 
 - **URL**: `/applications`
 - **方法**: GET
@@ -345,8 +436,16 @@
     }
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 401,
+    "message": "未授权访问"
+  }
+  ```
 
-#### 3.2 获取申请详情
+### 3.2 获取申请详情
 
 - **URL**: `/applications/{applicationId}`
 - **方法**: GET
@@ -389,8 +488,16 @@
     }
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 404,
+    "message": "找不到ID为{applicationId}的申请"
+  }
+  ```
 
-#### 3.3 创建申请
+### 3.3 创建申请
 
 - **URL**: `/applications`
 - **方法**: POST
@@ -417,15 +524,22 @@
     }
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 400,
+    "message": "请提供必要的申请信息"
+  }
+  ```
 
-#### 3.4 上传申请附件
+### 3.4 上传申请附件
 
 - **URL**: `/applications/{applicationId}/attachments`
 - **方法**: POST
 - **描述**: 上传申请的附件文件
 - **请求参数**: Form-Data格式
   - `file`: 文件数据
-  - `description`: 文件描述(可选)
 - **成功响应** (201):
   ```json
   {
@@ -439,8 +553,16 @@
     }
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 400,
+    "message": "请选择要上传的文件"
+  }
+  ```
 
-#### 3.5 批准申请
+### 3.5 批准申请
 
 - **URL**: `/applications/{applicationId}/approve`
 - **方法**: PATCH
@@ -467,8 +589,16 @@
     }
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 403,
+    "message": "用户角色 user 无权访问此资源"
+  }
+  ```
 
-#### 3.6 拒绝申请
+### 3.6 拒绝申请
 
 - **URL**: `/applications/{applicationId}/reject`
 - **方法**: PATCH
@@ -495,8 +625,16 @@
     }
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 400,
+    "message": "此申请已被处理，不能重复处理"
+  }
+  ```
 
-#### 3.7 获取申请统计
+### 3.7 获取申请统计
 
 - **URL**: `/applications/statistics`
 - **方法**: GET
@@ -529,10 +667,18 @@
     }
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 401,
+    "message": "未授权访问"
+  }
+  ```
 
-### 4. 用户设置
+## 4. 用户设置
 
-#### 4.1 获取用户设置
+### 4.1 获取用户设置
 
 - **URL**: `/settings`
 - **方法**: GET
@@ -552,8 +698,16 @@
     }
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 401,
+    "message": "未授权访问"
+  }
+  ```
 
-#### 4.2 更新用户设置
+### 4.2 更新用户设置
 
 - **URL**: `/settings`
 - **方法**: PUT
@@ -586,10 +740,18 @@
     }
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 400,
+    "message": "无效的设置值"
+  }
+  ```
 
-### 5. 文件管理
+## 5. 文件管理
 
-#### 5.1 上传文件
+### 5.1 上传文件
 
 - **URL**: `/files/upload`
 - **方法**: POST
@@ -610,8 +772,16 @@
     }
   }
   ```
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 400,
+    "message": "请选择要上传的文件"
+  }
+  ```
 
-#### 5.2 删除文件
+### 5.2 删除文件
 
 - **URL**: `/files/{fileId}`
 - **方法**: DELETE
@@ -623,72 +793,11 @@
     "message": "文件已删除"
   }
   ```
-
-## 数据库设计建议
-
-为支持以上API接口，建议创建以下数据库表：
-
-1. **用户表(users)**
-   - id: 主键
-   - username: 用户名(唯一)
-   - password: 密码(加密存储)
-   - name: 显示名称
-   - email: 电子邮箱(唯一)
-   - role: 角色(admin/user)
-   - phone: 电话号码
-   - avatar: 头像URL
-   - registerTime: 注册时间
-   - lastLoginTime: 最后登录时间
-
-2. **申请表(applications)**
-   - id: 主键
-   - itemName: 物品名称
-   - itemCategory: 物品类别
-   - quantity: 数量
-   - price: 预计价格
-   - purpose: 申请理由
-   - urgency: 紧急程度
-   - date: 申请日期
-   - status: 状态(pending/approved/rejected)
-   - applicantId: 申请人ID(外键)
-   - statusById: 处理人ID(外键)
-   - statusDate: 处理日期
-   - feedback: 审批反馈
-
-3. **附件表(attachments)**
-   - id: 主键
-   - applicationId: 申请ID(外键)
-   - filename: 文件名
-   - url: 文件URL
-   - type: 文件类型
-   - size: 文件大小
-   - uploadTime: 上传时间
-
-4. **用户设置表(settings)**
-   - id: 主键
-   - userId: 用户ID(外键)
-   - theme: 主题
-   - fontSize: 字体大小
-   - emailNotification: 是否接收邮件通知
-   - applicationUpdateNotification: 是否接收申请状态更新通知
-   - systemAnnouncementNotification: 是否接收系统公告通知
-
-## 安全建议
-
-1. 所有API接口(除登录/注册外)都应该要求认证
-2. 使用HTTPS保护数据传输
-3. 实现请求速率限制防止暴力攻击
-4. 对密码进行加盐哈希处理
-5. 实现CORS保护，限制允许的源
-6. 为API添加权限控制，确保用户只能访问自己的资源
-7. 实现API日志记录，便于安全审计
-
-## 部署建议
-
-建议采用以下技术栈进行后端开发：
-
-- Node.js + Express/Nest.js
-- 数据库：MongoDB或MySQL
-- 认证：JWT
-- 文件存储：AWS S3或本地文件系统
-- 部署：Docker + Kubernetes或云服务(Heroku/AWS/Azure) 
+- **失败响应**:
+  ```json
+  {
+    "success": false,
+    "code": 403,
+    "message": "未授权删除此文件"
+  }
+  ``` 

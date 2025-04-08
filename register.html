@@ -303,7 +303,9 @@
         </p>
     </div>
     
-    <script>
+    <script type="module">
+        import { AuthApi, ApiService } from './api-service.js';
+        
         document.addEventListener('DOMContentLoaded', function() {
             const registerForm = document.getElementById('registerForm');
             const username = document.getElementById('username');
@@ -405,7 +407,7 @@
             }
             
             // 表单验证
-            registerForm.addEventListener('submit', function(e) {
+            registerForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 let isValid = true;
                 
@@ -442,7 +444,7 @@
                     hideError(confirmPassword, document.getElementById('confirmPasswordError'));
                 }
                 
-                // 验证通过，模拟注册
+                // 验证通过，调用API注册
                 if (isValid) {
                     const registerButton = document.querySelector('.register-button');
                     const originalText = registerButton.textContent;
@@ -450,51 +452,42 @@
                     registerButton.textContent = '注册中...';
                     registerButton.disabled = true;
                     
-                    // 保存用户信息到localStorage
-                    const newUser = {
-                        id: generateUserId(),
-                        username: username.value,
-                        name: username.value, // 这里简化处理，实际应用可能需要额外的姓名字段
-                        password: password.value, // 注意：实际应用中不应明文存储密码
-                        role: 'user',
-                        registerTime: new Date().toISOString(),
-                        lastLoginTime: new Date().toISOString()
-                    };
-                    
-                    // 从localStorage获取现有的用户列表，如果不存在则创建一个新的空数组
-                    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-                    
-                    // 检查用户名是否已存在
-                    const userExists = existingUsers.some(user => user.username === newUser.username);
-                    if (userExists) {
-                        showError(username, document.getElementById('usernameError'), '用户名已存在，请更换一个');
-                        registerButton.textContent = originalText;
-                        registerButton.disabled = false;
-                        return;
-                    }
-                    
-                    // 添加新用户到列表并保存回localStorage
-                    existingUsers.push(newUser);
-                    localStorage.setItem('users', JSON.stringify(existingUsers));
-                    
-                    // 模拟注册请求
-                    setTimeout(function() {
-                        alert('注册成功！请前往登录页面');
-                        registerButton.textContent = originalText;
-                        registerButton.disabled = false;
+                    try {
+                        // 调用注册API
+                        const userData = {
+                            username: username.value,
+                            password: password.value
+                        };
+                        const response = await AuthApi.register(userData);
                         
-                        // 跳转到登录页面
-                        setTimeout(function() {
-                            window.location.href = 'login.html';
-                        }, 1000);
-                    }, 1500);
+                        if (response.success) {
+                            alert('注册成功！请前往登录页面');
+                            
+                            // 跳转到登录页面
+                            setTimeout(function() {
+                                window.location.href = 'login.html';
+                            }, 1000);
+                        } else {
+                            // 注册失败，显示错误信息
+                            showError(username, document.getElementById('usernameError'), response.message || '注册失败，请稍后重试');
+                            registerButton.textContent = originalText;
+                            registerButton.disabled = false;
+                        }
+                    } catch (error) {
+                        console.error('Registration error:', error);
+                        
+                        // 处理特定错误
+                        if (error.status === 409) {
+                            showError(username, document.getElementById('usernameError'), '用户名已存在，请更换一个');
+                        } else {
+                            showError(username, document.getElementById('usernameError'), error.message || '注册失败，请稍后重试');
+                        }
+                        
+                        registerButton.textContent = originalText;
+                        registerButton.disabled = false;
+                    }
                 }
             });
-            
-            // 生成唯一的用户ID
-            function generateUserId() {
-                return 'user_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-            }
             
             // 显示错误信息
             function showError(input, errorElement, message) {

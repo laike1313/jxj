@@ -268,6 +268,8 @@
                 </div>
             </div>
             
+            <div id="loginError" style="color: #ff4d4f; margin-bottom: 10px; font-size: 14px; display: none;"></div>
+            
             <div class="remember-forgot">
                 <div class="remember-me">
                     <input type="checkbox" id="remember">
@@ -283,13 +285,24 @@
             还没有账号? <a href="register.html" class="signup-link">立即注册</a>
         </p>
     </div>
-    
-    <script>
+
+    <script type="module">
+        import { AuthApi, ApiService, SettingsApi } from './api-service.js';
+        
         document.addEventListener('DOMContentLoaded', function() {
             const loginForm = document.getElementById('loginForm');
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
             const togglePasswordButton = document.getElementById('togglePassword');
+            const rememberCheckbox = document.getElementById('remember');
+            const loginError = document.getElementById('loginError');
+            
+            // 检查是否有记住的用户名
+            const rememberedUsername = localStorage.getItem('remembered_username');
+            if (rememberedUsername) {
+                usernameInput.value = rememberedUsername;
+                rememberCheckbox.checked = true;
+            }
             
             // 切换密码可见性
             togglePasswordButton.addEventListener('click', function() {
@@ -303,103 +316,96 @@
             });
             
             // 表单提交处理
-            loginForm.addEventListener('submit', function(e) {
+            loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                
-                // 简单验证
-                if (!usernameInput.value.trim()) {
-                    alert('请输入用户名');
-                    return;
-                }
-                
-                if (!passwordInput.value.trim()) {
-                    alert('请输入密码');
-                    return;
-                }
-                
-                // 模拟登录
-                const loginButton = document.querySelector('.login-button');
-                const originalText = loginButton.textContent;
-                
-                loginButton.textContent = '登录中...';
-                loginButton.disabled = true;
                 
                 // 获取用户信息
                 const username = usernameInput.value.trim();
                 const password = passwordInput.value.trim();
                 
-                // 管理员特殊处理
-                if (username === 'admin') {
-                    // 为管理员账号添加到用户列表中(如果没有的话)
-                    let users = JSON.parse(localStorage.getItem('users') || '[]');
-                    let adminUser = users.find(user => user.username === 'admin');
+                // 简单验证
+                if (!username) {
+                    showError('请输入用户名');
+                    return;
+                }
+                
+                if (!password) {
+                    showError('请输入密码');
+                    return;
+                }
+                
+                // 设置按钮loading状态
+                const loginButton = document.querySelector('.login-button');
+                const originalText = loginButton.textContent;
+                loginButton.textContent = '登录中...';
+                loginButton.disabled = true;
+                
+                try {
+                    // 调用登录API
+                    const response = await AuthApi.login(username, password);
                     
-                    if (!adminUser) {
-                        adminUser = {
-                            id: 'admin_' + Date.now(),
-                            username: 'admin',
-                            name: '系统管理员',
-                            password: 'admin123', // 实际应用中应加密
-                            role: 'admin',
-                            registerTime: new Date().toISOString(),
-                            lastLoginTime: new Date().toISOString()
-                        };
-                        users.push(adminUser);
-                        localStorage.setItem('users', JSON.stringify(users));
+                    if (response.success) {
+                        // 保存token和用户信息
+                        const { token, user } = response.data || {};
+                        
+                        // 验证user对象存在且包含必要信息
+                        if (!user) {
+                            console.error('登录响应中缺少用户信息');
+                            showError("登录返回数据异常，请联系管理员");
+                            loginButton.textContent = originalText;
+                            loginButton.disabled = false;
+                            return;
+                        }
+                        
+                        ApiService.setToken(token);
+                        
+                        // 存储用户信息
+                        sessionStorage.setItem('currentUser', JSON.stringify(user));
+                        
+                        // 记住用户名
+                        if (rememberCheckbox.checked) {
+                            localStorage.setItem('remembered_username', username);
+                        } else {
+                            localStorage.removeItem('remembered_username');
+                        }
+                        
+                        // 根据角色重定向
+                        setTimeout(function() {
+                            // 安全地访问user.role属性
+                            const userRole = user && user.role ? user.role : 'user';
+                            
+                            if (userRole === 'admin') {
+                                window.location.href = 'admin-dashboard.html';
+                            } else {
+                                window.location.href = 'user-dashboard.html';
+                            }
+                        }, 1000);
                     } else {
-                        // 更新管理员的最后登录时间
-                        adminUser.lastLoginTime = new Date().toISOString();
-                        localStorage.setItem('users', JSON.stringify(users));
+                        showError("登录失败，请重试");
+                        loginButton.textContent = originalText;
+                        loginButton.disabled = false;
                     }
-                    
-                    // 存储管理员信息到sessionStorage
-                    sessionStorage.setItem('currentUser', JSON.stringify({
-                        id: adminUser.id || 'admin_1',
-                        username: 'admin',
-                        name: '系统管理员',
-                        role: 'admin'
-                    }));
-                    
-                    setTimeout(function() {
-                        window.location.href = 'admin-dashboard.html';
-                    }, 1500);
-                    return;
-                }
-                
-                // 普通用户登录验证
-                const users = JSON.parse(localStorage.getItem('users') || '[]');
-                const user = users.find(user => user.username === username);
-                
-                if (!user) {
+                } catch (error) {
+                    console.error('Login error:', error);
+                    if (error.status === 401) {
+                        showError("用户名或密码不正确");
+                    } else {
+                        showError("登录失败: " + (error.message || "请稍后重试"));
+                    }
                     loginButton.textContent = originalText;
                     loginButton.disabled = false;
-                    alert('用户不存在，请先注册');
-                    return;
                 }
-                
-                if (user.password !== password) {
-                    loginButton.textContent = originalText;
-                    loginButton.disabled = false;
-                    alert('密码错误，请重试');
-                    return;
-                }
-                
-                // 登录成功，更新最后登录时间
-                user.lastLoginTime = new Date().toISOString();
-                localStorage.setItem('users', JSON.stringify(users));
-                
-                // 存储当前用户信息到sessionStorage
-                sessionStorage.setItem('currentUser', JSON.stringify({
-                    id: user.id,
-                    username: user.username,
-                    name: user.name,
-                    role: user.role
-                }));
-                
-                setTimeout(function() {
-                    window.location.href = 'user-dashboard.html';
-                }, 1500);
             });
+            
+            function showError(message) {
+                loginError.textContent = message;
+                loginError.style.display = 'block';
+                
+                // 5秒后自动隐藏错误信息
+                setTimeout(() => {
+                    loginError.style.display = 'none';
+                }, 5000);
+            }
         });
     </script>
 </body>

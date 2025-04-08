@@ -981,7 +981,13 @@
             </div>
             
             <div class="section-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);">
-                <span style="font-size: 20px; font-weight: 500; color: var(--text-color);">最近审批记录</span>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px; font-weight: 500; color: var(--text-color);">最近审批记录</span>
+                    <button id="refreshBtn" style="display: flex; align-items: center; gap: 5px; padding: 6px 12px; background-color: #f5f5f5; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer; font-size: 14px; color: var(--text-color);">
+                        <span style="font-size: 14px;">🔄</span>
+                        <span>手动刷新</span>
+                    </button>
+                </div>
                 <a href="#" class="view-all" id="viewAllRecordsBtn" style="color: var(--primary-color); font-size: 14px; text-decoration: none; display: flex; align-items: center;">
                     查看全部
                     <span style="margin-left: 4px;">&#8250;</span>
@@ -1223,53 +1229,80 @@
     
     <!-- 申请详情模态框 -->
     <div class="modal-backdrop" id="applicationDetailModal">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">申请详情</div>
-                <button class="close-button" id="closeDetailModalBtn">&times;</button>
+        <div class="modal" style="width: 650px; max-width: 95%;">
+            <div class="modal-header" style="background-color: var(--primary-color); color: white;">
+                <div class="modal-title" style="font-size: 20px; font-weight: 500;">申请详情</div>
+                <button class="close-button" id="closeDetailModalBtn" style="color: white;">&times;</button>
             </div>
-            <div class="modal-body">
-                <div class="item-detail">
-                    <div class="detail-label">申请ID</div>
-                    <div class="detail-value" id="detailId">#APL-001</div>
-                </div>
-                <div class="item-detail">
-                    <div class="detail-label">物品名称</div>
-                    <div class="detail-value" id="detailItemName">笔</div>
-                </div>
-                <div class="item-detail">
-                    <div class="detail-label">物品类别</div>
-                    <div class="detail-value" id="detailItemCategory">文具</div>
-                </div>
-                <div class="item-detail">
-                    <div class="detail-label">申请人</div>
-                    <div class="detail-value" id="detailApplicant">jxj</div>
-                </div>
-                <div class="item-detail">
-                    <div class="detail-label">申请数量</div>
-                    <div class="detail-value" id="detailQuantity">1</div>
-                </div>
-                <div class="item-detail">
-                    <div class="detail-label">用途说明</div>
-                    <div class="detail-value" id="detailPurpose">用于日常办公记录</div>
-                </div>
-                <div class="item-detail">
-                    <div class="detail-label">紧急程度</div>
-                    <div class="detail-value" id="detailUrgency">中</div>
-                </div>
-                <div class="item-detail">
-                    <div class="detail-label">申请时间</div>
-                    <div class="detail-value" id="detailTime">2025-04-01</div>
-                </div>
-                <div class="item-detail">
-                    <div class="detail-label">当前状态</div>
-                    <div class="detail-value" id="detailStatus">
-                        <span class="status-pill status-pending">已拒绝</span>
+            <div class="modal-body" style="padding: 30px;">
+                <div id="statusDisplay" style="margin-bottom: 20px; text-align: center;"></div>
+                
+                <div style="margin-bottom: 25px;">
+                    <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">基本信息</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <p style="margin-bottom: 5px; color: var(--text-secondary); font-size: 14px;">申请ID</p>
+                            <p style="font-weight: 500;" id="detailId">#APL-001</p>
+                        </div>
+                        <div>
+                            <p style="margin-bottom: 5px; color: var(--text-secondary); font-size: 14px;">申请日期</p>
+                            <p style="font-weight: 500;" id="detailDate">2023-05-10</p>
+                        </div>
+                        <div>
+                            <p style="margin-bottom: 5px; color: var(--text-secondary); font-size: 14px;">物品名称</p>
+                            <p style="font-weight: 500;" id="detailItemName">笔记本电脑</p>
+                        </div>
+                        <div>
+                            <p style="margin-bottom: 5px; color: var(--text-secondary); font-size: 14px;">物品类别</p>
+                            <p style="font-weight: 500;" id="detailItemCategory">电子设备</p>
+                        </div>
+                        <div>
+                            <p style="margin-bottom: 5px; color: var(--text-secondary); font-size: 14px;">数量</p>
+                            <p style="font-weight: 500;" id="detailQuantity">1</p>
+                        </div>
+                        <div>
+                            <p style="margin-bottom: 5px; color: var(--text-secondary); font-size: 14px;">预计价格</p>
+                            <p style="font-weight: 500;" id="detailPrice">5000 元</p>
+                        </div>
+                        <div>
+                            <p style="margin-bottom: 5px; color: var(--text-secondary); font-size: 14px;">紧急程度</p>
+                            <p style="font-weight: 500;" id="detailUrgency">中</p>
+                        </div>
+                        <div>
+                            <p style="margin-bottom: 5px; color: var(--text-secondary); font-size: 14px;">申请人</p>
+                            <p style="font-weight: 500;" id="detailApplicant">user</p>
+                        </div>
+                        <div>
+                            <p style="margin-bottom: 5px; color: var(--text-secondary); font-size: 14px;">处理人</p>
+                            <p style="font-weight: 500;" id="detailHandler">-</p>
+                        </div>
+                        <div>
+                            <p style="margin-bottom: 5px; color: var(--text-secondary); font-size: 14px;">提交时间</p>
+                            <p style="font-weight: 500;" id="detailSubmittedTime">-</p>
+                        </div>
                     </div>
                 </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">申请理由</h3>
+                    <div style="line-height: 1.6; background-color: #f9f9f9; padding: 15px; border-radius: 5px;" id="detailPurpose">申请理由内容...</div>
+                </div>
+                
+                <div id="attachmentSection" style="margin-bottom: 20px; display: none;">
+                    <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">附件</h3>
+                    <div id="attachmentPreview" style="text-align: center;"></div>
+                </div>
+                
+                <div id="feedbackSection" style="margin-bottom: 20px; display: none;">
+                    <h3 style="font-size: 18px; margin-bottom: 15px; color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">审批反馈</h3>
+                    <div id="feedbackContent" style="background-color: #f9f9f9; padding: 15px; border-radius: 5px;">反馈内容...</div>
+                </div>
             </div>
-            <div class="modal-footer" id="modalFooterActions">
+            <div class="modal-footer" id="modalFooterActions" style="padding: 15px 30px;">
                 <!-- 根据状态动态显示操作按钮 -->
+                <button class="btn btn-secondary" id="closeDetailBtn">关闭</button>
+                <button class="btn btn-danger" id="rejectDetailBtn">拒绝</button>
+                <button class="btn btn-success" id="approveDetailBtn">批准</button>
             </div>
         </div>
     </div>
@@ -1313,69 +1346,22 @@
         </div>
     </div>
     
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 确保系统设置页面默认隐藏
-            document.querySelector('.settings-content').style.display = 'none';
-            
-            // 在页面加载时立即加载并应用管理员设置
-            loadUserSettings();
-            
-            // 设置定时刷新，每10秒检查一次新申请
-            setInterval(function() {
-                // 从localStorage重新加载申请数据
-                const freshApplications = JSON.parse(localStorage.getItem('applications') || '[]');
-                
-                // 如果有新申请，更新页面
-                if (freshApplications.length !== applications.length) {
-                    applications = freshApplications;
-                    updateStats();
-                    renderApplicationsTable();
-                    console.log('检测到新申请，页面已更新');
-                }
-                
-                // 检查是否有状态变化
-                let hasStatusChange = false;
-                
-                if (applications.length > 0 && freshApplications.length > 0) {
-                    for (let i = 0; i < freshApplications.length; i++) {
-                        // 找到对应ID的申请
-                        const oldApp = applications.find(a => a.id === freshApplications[i].id);
-                        if (oldApp && oldApp.status !== freshApplications[i].status) {
-                            hasStatusChange = true;
-                            break;
-                        }
-                    }
-                }
-                
-                // 如果有状态变化，更新页面
-                if (hasStatusChange) {
-                    applications = freshApplications;
-                    updateStats();
-                    renderApplicationsTable();
-                    console.log('检测到申请状态变化，页面已更新');
-                }
-            }, 10000); // 10秒刷新一次
+    <script type="module">
+        import { ApplicationApi, UserApi, SettingsApi } from './api-service.js';
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            // 检查是否已登录和是否为管理员
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('您没有权限访问此页面');
+                window.location.href = 'user-dashboard.html';
+                return;
+            }
             
             // DOM元素
-            const logoutBtn = document.getElementById('logoutBtn');
-            const menuItems = document.querySelectorAll('.menu-item');
-            const headerTitle = document.querySelector('.header-title');
             const applicationsTable = document.getElementById('applicationsTable');
             const emptyApprovalState = document.getElementById('emptyApprovalState');
             const applicationDetailModal = document.getElementById('applicationDetailModal');
-            const closeDetailModalBtn = document.getElementById('closeDetailModalBtn');
-            const viewAllRecordsBtn = document.getElementById('viewAllRecordsBtn');
-            const modalFooterActions = document.getElementById('modalFooterActions');
-            
-            // 用户管理相关元素
-            const dashboardContent = document.querySelector('.dashboard-content');
-            const userManagement = document.querySelector('.user-management');
-            const usersList = document.getElementById('usersList');
-            const emptyUsersState = document.getElementById('emptyUsersState');
-            const addNewUserBtn = document.getElementById('addNewUserBtn');
-            
-            // 详情模态框元素
             const detailId = document.getElementById('detailId');
             const detailItemName = document.getElementById('detailItemName');
             const detailItemCategory = document.getElementById('detailItemCategory');
@@ -1383,45 +1369,93 @@
             const detailQuantity = document.getElementById('detailQuantity');
             const detailPurpose = document.getElementById('detailPurpose');
             const detailUrgency = document.getElementById('detailUrgency');
-            const detailTime = document.getElementById('detailTime');
-            const detailStatus = document.getElementById('detailStatus');
+            const detailDate = document.getElementById('detailDate');
+            const detailPrice = document.getElementById('detailPrice');
+            const detailHandler = document.getElementById('detailHandler');
+            const detailSubmittedTime = document.getElementById('detailSubmittedTime');
+            const modalFooterActions = document.getElementById('modalFooterActions');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const menuItems = document.querySelectorAll('.menu-item');
+            const headerTitle = document.querySelector('.header-title');
+            const dashboardContent = document.querySelector('.dashboard-content');
+            const userManagement = document.querySelector('.user-management');
+            const addNewUserBtn = document.getElementById('addNewUserBtn');
+            const viewAllRecordsBtn = document.getElementById('viewAllRecordsBtn');
+            const closeDetailModalBtn = document.getElementById('closeDetailModalBtn');
             
-            // 模拟数据
-            let applications = JSON.parse(localStorage.getItem('applications') || '[]');
+            // 存储应用程序数据
+            let applications = [];
             
-            // 如果没有申请数据，提供一些示例数据
-            if (applications.length === 0) {
-                applications = [
-                    { 
-                        id: "#APL-001", 
-                        itemName: "笔", 
-                        itemCategory: "文具",
-                        applicant: "jxj", 
-                        quantity: 1, 
-                        purpose: "用于日常办公记录", 
-                        urgency: "中", 
-                        date: "2025-04-01", 
-                        status: "rejected",
-                        statusDate: "2025-04-01",
-                        statusBy: "admin"
-                    },
-                    { 
-                        id: "#APL-002", 
-                        itemName: "笔记本电脑",
-                        itemCategory: "电子设备", 
-                        applicant: "jxj", 
-                        quantity: 1, 
-                        purpose: "用于日常办公签字", 
-                        urgency: "低", 
-                        date: "2025-04-01", 
-                        status: "approved",
-                        statusDate: "2025-04-01",
-                        statusBy: "admin"
+            // 加载申请数据
+            await loadApplications();
+            updateStats();
+            
+            // 移除定时刷新以避免覆盖用户新增的申请
+            // 仅在用户主动操作时更新数据（如新增、编辑申请）
+            
+            // 从API加载申请数据
+            async function loadApplications() {
+                try {
+                    // 调用API获取所有申请列表
+                    const response = await ApplicationApi.getApplications({ role: 'admin' });
+                    
+                    if (response.success) {
+                        applications = response.data.applications;
+                        
+                        // 如果没有申请数据
+                        if (applications.length === 0) {
+                            emptyApprovalState.style.display = 'flex';
+                        } else {
+                            renderApplicationsTable();
+                        }
+                    } else {
+                        console.error('Failed to load applications:', response.message);
                     }
-                ];
-                // 保存示例数据到localStorage
-                localStorage.setItem('applications', JSON.stringify(applications));
+                } catch (error) {
+                    console.error('Error loading applications:', error);
+                    // 网络错误或API不可用时使用本地存储的数据
+                    const cachedApps = JSON.parse(localStorage.getItem('admin_applications_cache') || '[]');
+                    if (cachedApps.length > 0) {
+                        applications = cachedApps;
+                        renderApplicationsTable();
+                    }
+                }
             }
+            
+            // 添加定时刷新功能，每30秒自动刷新一次申请列表
+            let autoRefreshTimer = setInterval(async () => {
+                console.log('自动刷新申请列表...');
+                await loadApplications();
+                updateStats();
+            }, 30000); // 30秒刷新一次
+            
+            // 页面卸载时清除定时器
+            window.addEventListener('beforeunload', () => {
+                if (autoRefreshTimer) {
+                    clearInterval(autoRefreshTimer);
+                }
+            });
+            
+            // 手动刷新按钮点击事件
+            document.getElementById('refreshBtn').addEventListener('click', async () => {
+                console.log('手动刷新申请列表...');
+                const refreshBtn = document.getElementById('refreshBtn');
+                
+                // 修改按钮状态，防止重复点击
+                refreshBtn.disabled = true;
+                refreshBtn.innerHTML = '<span style="font-size: 14px;">🔄</span><span>刷新中...</span>';
+                
+                // 刷新数据
+                await loadApplications();
+                updateStats();
+                
+                // 恢复按钮状态
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = '<span style="font-size: 14px;">🔄</span><span>手动刷新</span>';
+                
+                // 提示用户刷新成功
+                alert('申请列表已刷新！');
+            });
             
             // 渲染申请表格
             function renderApplicationsTable(filterStatus) {
@@ -1456,10 +1490,14 @@
                             actionsHtml = `
                                 <button class="action-btn approve-btn" data-id="${app.id}" style="background-color: var(--success-color); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; margin-right: 6px; font-size: 12px;">批准</button>
                                 <button class="action-btn reject-btn" data-id="${app.id}" style="background-color: var(--error-color); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; margin-right: 6px; font-size: 12px;">拒绝</button>
-                                <button class="action-btn view-btn" data-id="${app.id}" style="background-color: #f0f0f0; color: var(--text-color); border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">查看</button>
+                                <button class="action-btn view-btn" data-id="${app.id}" style="background-color: #f0f0f0; color: var(--text-color); border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; margin-right: 6px; font-size: 12px;">查看</button>
+                                <button class="action-btn delete-btn" data-id="${app.id}" style="background-color: #ff7875; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">删除</button>
                             `;
                         } else {
-                            actionsHtml = `<button class="action-btn view-btn" data-id="${app.id}" style="background-color: #f0f0f0; color: var(--text-color); border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">查看</button>`;
+                            actionsHtml = `
+                                <button class="action-btn view-btn" data-id="${app.id}" style="background-color: #f0f0f0; color: var(--text-color); border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; margin-right: 6px; font-size: 12px;">查看</button>
+                                <button class="action-btn delete-btn" data-id="${app.id}" style="background-color: #ff7875; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">删除</button>
+                            `;
                         }
                         
                         tableHtml += `
@@ -1468,7 +1506,7 @@
                                 <td style="padding: 16px; font-size: 14px; font-weight: 500;">${app.itemName}</td>
                                 <td style="padding: 16px; font-size: 14px;">${app.itemCategory || '未指定'}</td>
                                 <td style="padding: 16px; font-size: 14px;">${app.applicant}</td>
-                                <td style="padding: 16px; font-size: 14px;">${app.date}</td>
+                                <td style="padding: 16px; font-size: 14px;">${app.date || new Date(app.submittedTime).toLocaleDateString()}</td>
                                 <td style="padding: 16px; font-size: 14px;"><span class="status-pill ${statusClass}" style="padding: 4px 12px; border-radius: 20px; font-size: 12px; display: inline-block;">${statusText}</span></td>
                                 <td class="action-buttons" style="padding: 16px; font-size: 14px;">${actionsHtml}</td>
                             </tr>
@@ -1498,78 +1536,249 @@
                             rejectApplication(id);
                         });
                     });
+                    
+                    document.querySelectorAll('.delete-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const id = this.getAttribute('data-id');
+                            deleteApplication(id);
+                        });
+                    });
                 }
             }
             
             // 审批申请
-            function approveApplication(id) {
-                const app = applications.find(a => a.id === id);
-                if (app) {
-                    app.status = 'approved';
-                    app.statusDate = getCurrentDate();
-                    app.statusBy = 'admin';
+            async function approveApplication(id) {
+                try {
+                    // 显示确认对话框
+                    const feedback = prompt("请输入批准反馈（可选）:");
                     
-                    // 获取当前管理员信息
-                    const currentAdmin = JSON.parse(sessionStorage.getItem('currentUser') || '{"username": "admin"}');
-                    app.statusBy = currentAdmin.username;
+                    // 如果用户取消了确认，不执行后续操作
+                    if (feedback === null) {
+                        return;
+                    }
                     
-                    // 更新localStorage中的申请数据
-                    localStorage.setItem('applications', JSON.stringify(applications));
+                    // 调用API批准申请
+                    const response = await ApplicationApi.approveApplication(id, feedback || "");
                     
-                    updateStats();
-                    renderApplicationsTable();
-                    alert(`已批准申请: ${id}`);
+                    if (response.success) {
+                        // 重新加载申请列表
+                        await loadApplications();
+                        updateStats();
+                        alert(`已批准申请: ${id}`);
+                    } else {
+                        alert(`批准失败: ${response.message || '未知错误'}`);
+                    }
+                } catch (error) {
+                    console.error('Error approving application:', error);
+                    alert(`批准失败: ${error.message || '网络错误，请稍后重试'}`);
                 }
             }
             
             // 拒绝申请
-            function rejectApplication(id) {
-                const app = applications.find(a => a.id === id);
-                if (app) {
-                    app.status = 'rejected';
-                    app.statusDate = getCurrentDate();
+            async function rejectApplication(id) {
+                try {
+                    // 显示确认对话框
+                    const feedback = prompt("请输入拒绝原因（必填）:");
                     
-                    // 获取当前管理员信息
-                    const currentAdmin = JSON.parse(sessionStorage.getItem('currentUser') || '{"username": "admin"}');
-                    app.statusBy = currentAdmin.username;
+                    // 如果用户取消了确认或没有输入拒绝原因，不执行后续操作
+                    if (feedback === null || feedback.trim() === "") {
+                        alert("拒绝原因不能为空");
+                        return;
+                    }
                     
-                    // 更新localStorage中的申请数据
-                    localStorage.setItem('applications', JSON.stringify(applications));
+                    // 调用API拒绝申请
+                    const response = await ApplicationApi.rejectApplication(id, feedback);
                     
-                    updateStats();
-                    renderApplicationsTable();
-                    alert(`已拒绝申请: ${id}`);
+                    if (response.success) {
+                        // 重新加载申请列表
+                        await loadApplications();
+                        updateStats();
+                        alert(`已拒绝申请: ${id}`);
+                    } else {
+                        alert(`拒绝失败: ${response.message || '未知错误'}`);
+                    }
+                } catch (error) {
+                    console.error('Error rejecting application:', error);
+                    alert(`拒绝失败: ${error.message || '网络错误，请稍后重试'}`);
+                }
+            }
+            
+            // 删除申请
+            async function deleteApplication(id) {
+                try {
+                    // 显示确认对话框
+                    if (!confirm(`确定要删除申请 ${id} 吗？此操作不可恢复！`)) {
+                        return;
+                    }
+                    
+                    // 显示加载状态
+                    const btn = document.querySelector(`.delete-btn[data-id="${id}"]`);
+                    if (btn) {
+                        const originalText = btn.textContent;
+                        btn.textContent = '删除中...';
+                        btn.disabled = true;
+                    }
+                    
+                    // 调用API删除申请
+                    const response = await ApplicationApi.deleteApplication(id);
+                    
+                    if (response.success) {
+                        // 重新加载申请列表
+                        await loadApplications();
+                        updateStats();
+                        alert(`已删除申请: ${id}`);
+                    } else {
+                        alert(`删除失败: ${response.message || '未知错误'}`);
+                        // 恢复按钮状态
+                        if (btn) {
+                            btn.textContent = '删除';
+                            btn.disabled = false;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error deleting application:', error);
+                    alert(`删除失败: ${error.message || '网络错误，请稍后重试'}`);
+                    
+                    // 恢复按钮状态
+                    const btn = document.querySelector(`.delete-btn[data-id="${id}"]`);
+                    if (btn) {
+                        btn.textContent = '删除';
+                        btn.disabled = false;
+                    }
                 }
             }
             
             // 显示申请详情
-            function showApplicationDetail(id) {
-                const app = applications.find(a => a.id === id);
-                if (app) {
-                    detailId.textContent = app.id;
-                    detailItemName.textContent = app.itemName;
-                    detailItemCategory.textContent = app.itemCategory || '未指定';
-                    detailApplicant.textContent = app.applicant;
-                    detailQuantity.textContent = app.quantity;
-                    detailPurpose.textContent = app.purpose;
-                    detailUrgency.textContent = app.urgency;
-                    detailTime.textContent = app.date;
+            async function showApplicationDetail(id) {
+                try {
+                    // 显示加载状态
+                    applicationDetailModal.style.display = 'flex';
+                    detailId.textContent = '加载中...';
                     
+                    // 获取详细信息
+                    const response = await ApplicationApi.getApplicationDetail(id);
+                    
+                    if (!response.success) {
+                        alert('获取申请详情失败');
+                        closeDetailModal();
+                        return;
+                    }
+                    
+                    const app = response.data;
+                    
+                    // 设置基本信息
+                    detailId.textContent = app.id || '-';
+                    detailItemName.textContent = app.itemName || '-';
+                    detailItemCategory.textContent = app.itemCategory || '-';
+                    detailApplicant.textContent = app.applicant || '-';
+                    detailQuantity.textContent = app.quantity || '-';
+                    detailPurpose.textContent = app.purpose || '-';
+                    detailUrgency.textContent = app.urgency || '-';
+                    detailDate.textContent = app.date || new Date(app.submittedTime).toLocaleDateString();
+                    detailPrice.textContent = app.price ? `${app.price} 元` : '-';
+                    detailHandler.textContent = app.handlerName || '-';
+                    
+                    // 格式化提交时间
+                    let formattedTime = '-';
+                    if (app.submittedTime) {
+                        const submitDate = new Date(app.submittedTime);
+                        formattedTime = `${submitDate.toLocaleDateString()} ${submitDate.toLocaleTimeString()}`;
+                    }
+                    detailSubmittedTime.textContent = formattedTime;
+                    
+                    // 设置申请状态显示
                     let statusText = '';
                     let statusClass = '';
+                    let statusHTML = '';
                     
                     if (app.status === 'pending') {
                         statusText = '处理中';
                         statusClass = 'status-pending';
+                        statusHTML = `
+                            <div style="display: inline-block; background-color: rgba(250, 173, 20, 0.1); color: var(--warning-color); padding: 8px 20px; border-radius: 20px; font-weight: 500;">
+                                <span style="margin-right: 8px;">⏳</span> ${statusText}
+                            </div>
+                        `;
                     } else if (app.status === 'approved') {
                         statusText = '已批准';
                         statusClass = 'status-approved';
+                        statusHTML = `
+                            <div style="display: inline-block; background-color: rgba(82, 196, 26, 0.1); color: var(--success-color); padding: 8px 20px; border-radius: 20px; font-weight: 500;">
+                                <span style="margin-right: 8px;">✅</span> ${statusText}
+                            </div>
+                        `;
                     } else if (app.status === 'rejected') {
                         statusText = '已拒绝';
                         statusClass = 'status-rejected';
+                        statusHTML = `
+                            <div style="display: inline-block; background-color: rgba(255, 77, 79, 0.1); color: var(--error-color); padding: 8px 20px; border-radius: 20px; font-weight: 500;">
+                                <span style="margin-right: 8px;">❌</span> ${statusText}
+                            </div>
+                        `;
                     }
                     
-                    detailStatus.innerHTML = `<span class="status-pill ${statusClass}">${statusText}</span>`;
+                    document.getElementById('statusDisplay').innerHTML = statusHTML;
+                    
+                    // 处理附件预览（如果有的话）
+                    const attachmentSection = document.getElementById('attachmentSection');
+                    const attachmentPreview = document.getElementById('attachmentPreview');
+                    
+                    if (app.attachments && app.attachments.length > 0) {
+                        attachmentSection.style.display = 'block';
+                        attachmentPreview.innerHTML = '';
+                        
+                        app.attachments.forEach(attachment => {
+                            if (attachment.fileType.startsWith('image/')) {
+                                // 图片附件
+                                const img = document.createElement('img');
+                                img.src = attachment.url;
+                                img.style.maxWidth = '100%';
+                                img.style.maxHeight = '200px';
+                                img.style.borderRadius = '4px';
+                                img.style.marginBottom = '10px';
+                                attachmentPreview.appendChild(img);
+                            } else {
+                                // 其他类型附件
+                                const fileContainer = document.createElement('div');
+                                fileContainer.style.marginBottom = '15px';
+                                
+                                const fileIcon = document.createElement('div');
+                                fileIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="#7B68EE" viewBox="0 0 16 16"><path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/></svg>';
+                                fileIcon.style.margin = '0 auto 10px';
+                                
+                                const fileName = document.createElement('div');
+                                fileName.textContent = attachment.fileName || '附件';
+                                fileName.style.fontSize = '14px';
+                                
+                                const downloadLink = document.createElement('a');
+                                downloadLink.href = attachment.url;
+                                downloadLink.target = '_blank';
+                                downloadLink.textContent = '下载';
+                                downloadLink.style.display = 'block';
+                                downloadLink.style.marginTop = '5px';
+                                downloadLink.style.color = '#7B68EE';
+                                
+                                fileContainer.appendChild(fileIcon);
+                                fileContainer.appendChild(fileName);
+                                fileContainer.appendChild(downloadLink);
+                                
+                                attachmentPreview.appendChild(fileContainer);
+                            }
+                        });
+                    } else {
+                        attachmentSection.style.display = 'none';
+                    }
+                    
+                    // 显示反馈信息（如果有的话）
+                    const feedbackSection = document.getElementById('feedbackSection');
+                    const feedbackContent = document.getElementById('feedbackContent');
+                    
+                    if (app.feedback && (app.status === 'approved' || app.status === 'rejected')) {
+                        feedbackSection.style.display = 'block';
+                        feedbackContent.textContent = app.feedback;
+                    } else {
+                        feedbackSection.style.display = 'none';
+                    }
                     
                     // 根据状态显示不同的操作按钮
                     if (app.status === 'pending') {
@@ -1597,8 +1806,10 @@
                     
                     document.getElementById('closeDetailBtn').addEventListener('click', closeDetailModal);
                     
-                    // 显示模态框
-                    applicationDetailModal.style.display = 'flex';
+                } catch (error) {
+                    console.error('Error loading application details:', error);
+                    alert('获取申请详情失败，请稍后重试');
+                    closeDetailModal();
                 }
             }
             
@@ -1608,70 +1819,88 @@
             }
             
             // 更新统计数据和图表
-            function updateStats() {
+            async function updateStats() {
                 const pendingCount = applications.filter(app => app.status === 'pending').length;
                 const approvedCount = applications.filter(app => app.status === 'approved').length;
                 const rejectedCount = applications.filter(app => app.status === 'rejected').length;
                 const totalApps = applications.length;
                 
-                // 获取最近7天的日期
-                const today = new Date();
-                const sevenDaysAgo = new Date();
-                sevenDaysAgo.setDate(today.getDate() - 7);
-                
-                // 分析申请类型 - 筛选最近7天的申请
-                const itemTypes = {};
-                const recentApps = applications.filter(app => {
-                    const appDate = new Date(app.date);
-                    return appDate >= sevenDaysAgo && appDate <= today;
-                });
-                
-                // 统计最近7天的申请类型
-                recentApps.forEach(app => {
-                    if (app.itemCategory) {
-                        if (!itemTypes[app.itemCategory]) {
-                            itemTypes[app.itemCategory] = 0;
-                        }
-                        itemTypes[app.itemCategory]++;
-                    }
-                });
-                
-                // 默认分类
-                const defaultCategories = {
-                    "文具": 0,
-                    "电子设备": 0,
-                    "办公用品": 0,
-                    "家具": 0,
-                    "其他": 0
-                };
-                
-                // 合并实际数据
-                Object.keys(itemTypes).forEach(key => {
-                    if (defaultCategories[key] !== undefined) {
-                        defaultCategories[key] += itemTypes[key];
+                try {
+                    // 获取申请类型统计数据
+                    const statsResponse = await ApplicationApi.getApplicationsStatistics({ days: 7 });
+                    
+                    if (statsResponse.success) {
+                        // 更新申请类型饼图标题，显示"最近7天申请类型分布"
+                        document.querySelector('.chart-title:first-of-type').textContent = "最近7天申请类型分布";
+                        
+                        // 更新申请类型饼图
+                        updateCategoryPieChart(statsResponse.data.typeDistribution);
                     } else {
-                        defaultCategories["其他"] += itemTypes[key];
+                        // 使用本地数据作为备用
+                        // 获取最近7天的日期
+                        const today = new Date();
+                        const sevenDaysAgo = new Date();
+                        sevenDaysAgo.setDate(today.getDate() - 7);
+                        
+                        // 分析申请类型 - 筛选最近7天的申请
+                        const itemTypes = {
+                            "文具": 0,
+                            "电子设备": 0,
+                            "办公用品": 0,
+                            "家具": 0,
+                            "其他": 0
+                        };
+                        
+                        const recentApps = applications.filter(app => {
+                            const appDate = new Date(app.date || app.submittedTime);
+                            return appDate >= sevenDaysAgo && appDate <= today;
+                        });
+                        
+                        // 统计最近7天的申请类型
+                        recentApps.forEach(app => {
+                            if (app.itemCategory) {
+                                if (itemTypes[app.itemCategory] !== undefined) {
+                                    itemTypes[app.itemCategory]++;
+                                } else {
+                                    itemTypes["其他"]++;
+                                }
+                            }
+                        });
+                        
+                        updateCategoryPieChart(itemTypes);
                     }
-                });
+                } catch (error) {
+                    console.error('Error loading statistics:', error);
+                    // 使用本地计算的统计数据
+                    const itemTypes = {
+                        "文具": 0,
+                        "电子设备": 0,
+                        "办公用品": 0,
+                        "家具": 0,
+                        "其他": 0
+                    };
+                    updateCategoryPieChart(itemTypes);
+                }
                 
-                // 更新申请类型饼图标题，显示"最近7天申请类型分布"
-                document.querySelector('.chart-title:first-of-type').textContent = "最近7天申请类型分布";
-                
-                // 更新申请类型饼图
-                updateCategoryPieChart(defaultCategories);
+                // 获取用户统计数据
+                try {
+                    const usersResponse = await UserApi.getUserCount();
+                    const userCount = usersResponse.success ? usersResponse.data.count : 0;
+                    // 更新顶部卡片数据
+                    document.querySelector('.users-icon + .stat-content .stat-value').textContent = userCount;
+                } catch (error) {
+                    console.error('Error loading user count:', error);
+                    // 如果API失败，使用0作为默认值
+                    document.querySelector('.users-icon + .stat-content .stat-value').textContent = 0;
+                }
                 
                 // 更新状态饼图
                 updatePieChart(pendingCount, approvedCount, rejectedCount, totalApps);
                 
-                // 从localStorage获取用户数量
-                const users = JSON.parse(localStorage.getItem('users') || '[]');
-                const userCount = users.length;
-                
-                // 更新顶部卡片数据
+                // 更新顶部卡片数据 - 申请数量
                 document.querySelector('.pending-icon + .stat-content .stat-value').textContent = pendingCount;
                 document.querySelector('.approved-icon + .stat-content .stat-value').textContent = approvedCount;
                 document.querySelector('.rejected-icon + .stat-content .stat-value').textContent = rejectedCount;
-                document.querySelector('.users-icon + .stat-content .stat-value').textContent = userCount;
             }
             
             // 更新申请类型饼图
@@ -2202,7 +2431,7 @@
                 const resetAvatar = document.getElementById('resetAvatar');
                 
                 // 处理文件上传
-                avatarUpload.addEventListener('change', function(e) {
+                avatarUpload.addEventListener('change', async function(e) {
                     const file = e.target.files[0];
                     if (!file) return;
                     
@@ -2214,38 +2443,67 @@
                     
                     // 预览上传的图片
                     const reader = new FileReader();
-                    reader.onload = function(e) {
+                    reader.onload = async function(e) {
                         currentAvatar.src = e.target.result;
                         currentAvatar.style.display = 'block';
                         avatarPlaceholder.style.display = 'none';
                         
-                        // 保存头像到localStorage
-                        saveUserSettings({
+                        // 保存头像设置
+                        const avatarSettings = {
                             avatar: e.target.result,
                             avatarType: 'custom'
-                        });
+                        };
+                        
+                        try {
+                            // 保存设置到数据库
+                            await saveUserSettings(avatarSettings);
+                            
+                            // 更新当前会话中的用户信息
+                            const sessionUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+                            sessionUser.avatar = e.target.result;
+                            sessionUser.avatarType = 'custom';
+                            sessionStorage.setItem('currentUser', JSON.stringify(sessionUser));
+                        } catch (error) {
+                            console.error('保存头像失败', error);
+                            alert('头像保存失败，请重试');
+                        }
                     };
                     reader.readAsDataURL(file);
                 });
                 
                 // 重置头像
-                resetAvatar.addEventListener('click', function() {
+                resetAvatar.addEventListener('click', async function() {
                     currentAvatar.src = '';
                     currentAvatar.style.display = 'none';
                     avatarPlaceholder.style.display = 'block';
                     
                     // 更新设置
-                    saveUserSettings({
+                    const avatarSettings = {
                         avatar: null,
                         avatarType: 'default',
                         avatarColor: '#7B68EE'
-                    });
+                    };
+                    
+                    try {
+                        // 保存设置到数据库
+                        await saveUserSettings(avatarSettings);
+                        
+                        // 更新当前会话中的用户信息
+                        const sessionUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+                        sessionUser.avatar = null;
+                        sessionUser.avatarType = 'default';
+                        sessionUser.avatarColor = '#7B68EE';
+                        sessionStorage.setItem('currentUser', JSON.stringify(sessionUser));
+                    } catch (error) {
+                        console.error('重置头像失败', error);
+                        alert('头像重置失败，请重试');
+                    }
                 });
                 
                 // 预设头像选择
                 const presetAvatars = document.querySelectorAll('.preset-avatar');
                 presetAvatars.forEach(avatar => {
-                    avatar.addEventListener('click', function() {
+                    avatar.addEventListener('click', async function() {
                         const color = this.getAttribute('data-color');
                         
                         // 更新预览
@@ -2254,11 +2512,26 @@
                         document.querySelector('.avatar-preview').style.backgroundColor = color;
                         
                         // 保存设置
-                        saveUserSettings({
+                        const avatarSettings = {
                             avatar: null,
                             avatarType: 'preset',
                             avatarColor: color
-                        });
+                        };
+                        
+                        try {
+                            // 保存设置到数据库
+                            await saveUserSettings(avatarSettings);
+                            
+                            // 更新当前会话中的用户信息
+                            const sessionUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+                            sessionUser.avatar = null;
+                            sessionUser.avatarType = 'preset';
+                            sessionUser.avatarColor = color;
+                            sessionStorage.setItem('currentUser', JSON.stringify(sessionUser));
+                        } catch (error) {
+                            console.error('保存头像设置失败', error);
+                            alert('头像设置保存失败，请重试');
+                        }
                     });
                 });
                 
@@ -2379,120 +2652,141 @@
             }
             
             // 加载用户设置
-            function loadUserSettings() {
-                // 获取当前管理员信息
-                const currentAdmin = JSON.parse(sessionStorage.getItem('currentUser') || '{"username": "admin"}');
-                
-                // 从localStorage获取设置
-                const settings = JSON.parse(localStorage.getItem(`userSettings_${currentAdmin.username}`) || '{}');
-                
-                // 应用头像设置到侧边栏
-                if (settings.avatarType === 'custom' && settings.avatar) {
-                    // 自定义上传的头像
-                    const sidebarAvatar = document.querySelector('.sidebar .avatar');
-                    sidebarAvatar.innerHTML = '';
-                    const img = document.createElement('img');
-                    img.src = settings.avatar;
-                    img.style.width = '100%';
-                    img.style.height = '100%';
-                    img.style.objectFit = 'cover';
-                    sidebarAvatar.appendChild(img);
+            async function loadUserSettings() {
+                try {
+                    // 获取当前管理员信息
+                    const currentAdmin = JSON.parse(sessionStorage.getItem('currentUser') || '{"username": "admin"}');
                     
-                    // 设置页面预览
-                    if (document.getElementById('currentAvatar')) {
-                        document.getElementById('currentAvatar').src = settings.avatar;
-                        document.getElementById('currentAvatar').style.display = 'block';
-                        document.getElementById('avatarPlaceholder').style.display = 'none';
-                    }
-                } else if (settings.avatarType === 'preset' && settings.avatarColor) {
-                    // 预设颜色头像
-                    const sidebarAvatar = document.querySelector('.sidebar .avatar');
-                    sidebarAvatar.innerHTML = 'A';
-                    sidebarAvatar.style.backgroundColor = settings.avatarColor;
+                    // 从API获取设置
+                    const response = await SettingsApi.getUserSettings();
                     
-                    // 设置页面预览
-                    if (document.querySelector('.avatar-preview')) {
-                        document.querySelector('.avatar-preview').style.backgroundColor = settings.avatarColor;
-                        if (document.getElementById('currentAvatar')) {
-                            document.getElementById('currentAvatar').style.display = 'none';
-                        }
-                        if (document.getElementById('avatarPlaceholder')) {
-                            document.getElementById('avatarPlaceholder').style.display = 'block';
-                        }
+                    if (!response.success) {
+                        console.error('获取用户设置失败', response);
+                        return;
                     }
-                }
-                
-                // 应用用户名称到侧边栏
-                if (settings.displayName) {
-                    const userNameElement = document.querySelector('.sidebar .user-name');
-                    if (userNameElement) {
-                        userNameElement.textContent = settings.displayName;
-                    }
-                }
-                
-                // 填充基本信息
-                if (settings.displayName && document.getElementById('profileDisplayName')) {
-                    document.getElementById('profileDisplayName').value = settings.displayName;
-                }
-                
-                if (settings.email && document.getElementById('profileEmail')) {
-                    document.getElementById('profileEmail').value = settings.email;
-                }
-                
-                if (settings.phone && document.getElementById('profilePhone')) {
-                    document.getElementById('profilePhone').value = settings.phone;
-                }
-                
-                // 设置颜色选项
-                if (settings.themeColor) {
-                    const colorOptions = document.querySelectorAll('.color-option');
-                    colorOptions.forEach(option => {
-                        option.classList.remove('active');
-                        option.style.border = 'none';
+                    
+                    const settings = response.data || {};
+                    
+                    // 应用头像设置到侧边栏
+                    if (settings.avatarType === 'custom' && settings.avatar) {
+                        // 自定义上传的头像
+                        const sidebarAvatar = document.querySelector('.sidebar .avatar');
+                        sidebarAvatar.innerHTML = '';
+                        const img = document.createElement('img');
+                        img.src = settings.avatar;
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'cover';
+                        sidebarAvatar.appendChild(img);
                         
-                        if (option.getAttribute('data-color') === settings.themeColor) {
-                            option.classList.add('active');
-                            option.style.border = '2px solid #333';
+                        // 设置页面预览
+                        if (document.getElementById('currentAvatar')) {
+                            document.getElementById('currentAvatar').src = settings.avatar;
+                            document.getElementById('currentAvatar').style.display = 'block';
+                            document.getElementById('avatarPlaceholder').style.display = 'none';
                         }
-                    });
-                }
-                
-                // 设置字体大小
-                if (settings.fontSize && document.getElementById('fontSize')) {
-                    document.getElementById('fontSize').value = settings.fontSize;
-                }
-                
-                // 设置通知选项
-                if (settings.notifications) {
-                    const notices = settings.notifications;
-                    if (document.getElementById('newApplicationNotice')) {
-                        document.getElementById('newApplicationNotice').checked = notices.newApplication !== false;
+                    } else if (settings.avatarType === 'preset' && settings.avatarColor) {
+                        // 预设颜色头像
+                        const sidebarAvatar = document.querySelector('.sidebar .avatar');
+                        sidebarAvatar.innerHTML = 'A';
+                        sidebarAvatar.style.backgroundColor = settings.avatarColor;
+                        
+                        // 设置页面预览
+                        if (document.querySelector('.avatar-preview')) {
+                            document.querySelector('.avatar-preview').style.backgroundColor = settings.avatarColor;
+                            if (document.getElementById('currentAvatar')) {
+                                document.getElementById('currentAvatar').style.display = 'none';
+                            }
+                            if (document.getElementById('avatarPlaceholder')) {
+                                document.getElementById('avatarPlaceholder').style.display = 'block';
+                            }
+                        }
                     }
-                    if (document.getElementById('newUserNotice')) {
-                        document.getElementById('newUserNotice').checked = !!notices.newUser;
+                    
+                    // 应用用户名称到侧边栏
+                    if (settings.displayName) {
+                        const userNameElement = document.querySelector('.sidebar .user-name');
+                        if (userNameElement) {
+                            userNameElement.textContent = settings.displayName;
+                        }
                     }
-                    if (document.getElementById('systemUpdateNotice')) {
-                        document.getElementById('systemUpdateNotice').checked = notices.systemUpdate !== false;
+                    
+                    // 填充基本信息
+                    if (settings.displayName && document.getElementById('profileDisplayName')) {
+                        document.getElementById('profileDisplayName').value = settings.displayName;
                     }
+                    
+                    if (settings.email && document.getElementById('profileEmail')) {
+                        document.getElementById('profileEmail').value = settings.email;
+                    }
+                    
+                    if (settings.phone && document.getElementById('profilePhone')) {
+                        document.getElementById('profilePhone').value = settings.phone;
+                    }
+                    
+                    // 设置颜色选项
+                    if (settings.themeColor) {
+                        const colorOptions = document.querySelectorAll('.color-option');
+                        colorOptions.forEach(option => {
+                            option.classList.remove('active');
+                            option.style.border = 'none';
+                            
+                            if (option.getAttribute('data-color') === settings.themeColor) {
+                                option.classList.add('active');
+                                option.style.border = '2px solid #333';
+                            }
+                        });
+                    }
+                    
+                    // 设置字体大小
+                    if (settings.fontSize && document.getElementById('fontSize')) {
+                        document.getElementById('fontSize').value = settings.fontSize;
+                    }
+                    
+                    // 设置通知选项
+                    if (settings.notifications) {
+                        const notices = settings.notifications;
+                        if (document.getElementById('newApplicationNotice')) {
+                            document.getElementById('newApplicationNotice').checked = notices.newApplication !== false;
+                        }
+                        if (document.getElementById('newUserNotice')) {
+                            document.getElementById('newUserNotice').checked = !!notices.newUser;
+                        }
+                        if (document.getElementById('systemUpdateNotice')) {
+                            document.getElementById('systemUpdateNotice').checked = notices.systemUpdate !== false;
+                        }
+                    }
+                } catch (error) {
+                    console.error('加载用户设置失败', error);
                 }
             }
             
             // 保存用户设置
-            function saveUserSettings(newSettings) {
-                // 获取当前管理员信息
-                const currentAdmin = JSON.parse(sessionStorage.getItem('currentUser') || '{"username": "admin"}');
-                
-                // 获取当前设置
-                const currentSettings = JSON.parse(localStorage.getItem(`userSettings_${currentAdmin.username}`) || '{}');
-                
-                // 合并新设置
-                const updatedSettings = { ...currentSettings, ...newSettings };
-                
-                // 保存到localStorage
-                localStorage.setItem(`userSettings_${currentAdmin.username}`, JSON.stringify(updatedSettings));
-                
-                // 更新侧边栏的管理员头像
-                updateAdminAvatar(updatedSettings);
+            async function saveUserSettings(newSettings) {
+                try {
+                    // 获取当前管理员信息
+                    const currentAdmin = JSON.parse(sessionStorage.getItem('currentUser') || '{"username": "admin"}');
+                    
+                    // 获取当前设置
+                    const response = await SettingsApi.getUserSettings();
+                    const currentSettings = response.success ? response.data || {} : {};
+                    
+                    // 合并新设置
+                    const updatedSettings = { ...currentSettings, ...newSettings };
+                    
+                    // 通过API保存设置
+                    const saveResponse = await SettingsApi.updateUserSettings(updatedSettings);
+                    
+                    if (!saveResponse.success) {
+                        console.error('保存用户设置失败', saveResponse);
+                        return;
+                    }
+                    
+                    // 更新侧边栏的管理员头像
+                    updateAdminAvatar(updatedSettings);
+                } catch (error) {
+                    console.error('保存用户设置失败', error);
+                }
             }
             
             // 更新管理员头像
